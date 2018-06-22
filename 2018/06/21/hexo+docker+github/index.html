@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="spark," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -79,21 +79,17 @@
 
 
 
-<meta name="description" content="Source源码调用 Structured Streaming在Source阶段的调用过程如上图 1.在start时会启动StreamExecution内部属性microBatchThread线程，在线程内部调用runBatches方法；2.在方法内执行triggerExecutor.execute调用runBatch方法；3.调用source的getBatch返回具体数据的DataFrame；4">
-<meta name="keywords" content="spark">
+<meta name="description" content="背景在博客网站发布markdown格式的博客越来越方便，但发现好多个人博客的样式大都一样，研究发现好多都是使用github+hexo+个人域名，貌似并不复杂，所以尝试搞起。使用Mac + Docker + Hexo + github，由于不想在自己电脑安装过多的东西，所以docker是最好的选择。 过程打包hexo镜像在docker官方hub上找了几个hexo的镜像，发现stars和pull的都不">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Spark Structured Streaming Source Sink整理">
-<meta property="og:url" content="http://li1231.com/2018/06/22/source_and_sink/index.html">
+<meta property="og:title" content="Docker部署hexo在github搭建博客">
+<meta property="og:url" content="http://li1231.com/2018/06/21/hexo+docker+github/index.html">
 <meta property="og:site_name" content="li1231">
-<meta property="og:description" content="Source源码调用 Structured Streaming在Source阶段的调用过程如上图 1.在start时会启动StreamExecution内部属性microBatchThread线程，在线程内部调用runBatches方法；2.在方法内执行triggerExecutor.execute调用runBatch方法；3.调用source的getBatch返回具体数据的DataFrame；4">
+<meta property="og:description" content="背景在博客网站发布markdown格式的博客越来越方便，但发现好多个人博客的样式大都一样，研究发现好多都是使用github+hexo+个人域名，貌似并不复杂，所以尝试搞起。使用Mac + Docker + Hexo + github，由于不想在自己电脑安装过多的东西，所以docker是最好的选择。 过程打包hexo镜像在docker官方hub上找了几个hexo的镜像，发现stars和pull的都不">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://li1231.com/images/s_source.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:image" content="http://li1231.com/images/s_sink.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2018-06-22T09:30:37.000Z">
+<meta property="og:updated_time" content="2018-06-22T15:38:57.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Spark Structured Streaming Source Sink整理">
-<meta name="twitter:description" content="Source源码调用 Structured Streaming在Source阶段的调用过程如上图 1.在start时会启动StreamExecution内部属性microBatchThread线程，在线程内部调用runBatches方法；2.在方法内执行triggerExecutor.execute调用runBatch方法；3.调用source的getBatch返回具体数据的DataFrame；4">
-<meta name="twitter:image" content="http://li1231.com/images/s_source.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta name="twitter:title" content="Docker部署hexo在github搭建博客">
+<meta name="twitter:description" content="背景在博客网站发布markdown格式的博客越来越方便，但发现好多个人博客的样式大都一样，研究发现好多都是使用github+hexo+个人域名，貌似并不复杂，所以尝试搞起。使用Mac + Docker + Hexo + github，由于不想在自己电脑安装过多的东西，所以docker是最好的选择。 过程打包hexo镜像在docker官方hub上找了几个hexo的镜像，发现stars和pull的都不">
 
 
 
@@ -123,13 +119,13 @@
 
 
 
-  <link rel="canonical" href="http://li1231.com/2018/06/22/source_and_sink/"/>
+  <link rel="canonical" href="http://li1231.com/2018/06/21/hexo+docker+github/"/>
 
 
 
 
 
-  <title>Spark Structured Streaming Source Sink整理 | li1231</title>
+  <title>Docker部署hexo在github搭建博客 | li1231</title>
   
 
 
@@ -236,7 +232,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://li1231.com/2018/06/22/source_and_sink/">
+    <link itemprop="mainEntityOfPage" href="http://li1231.com/2018/06/21/hexo+docker+github/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="li1231">
@@ -253,7 +249,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Spark Structured Streaming Source Sink整理</h1>
+          <h1 class="post-title" itemprop="name headline">Docker部署hexo在github搭建博客</h1>
         
 
         <div class="post-meta">
@@ -265,7 +261,7 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-22T00:35:32+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-21T16:00:00+00:00">
                 2018-06-22
               </time>
             
@@ -303,12 +299,37 @@
       
 
       
-        <h2 id="Source源码调用"><a href="#Source源码调用" class="headerlink" title="Source源码调用"></a>Source源码调用</h2><p><img src="/images/s_source.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
-<p>Structured Streaming在Source阶段的调用过程如上图</p>
-<p>1.在start时会启动StreamExecution内部属性microBatchThread线程，在线程内部调用runBatches方法；<br>2.在方法内执行triggerExecutor.execute调用runBatch方法；<br>3.调用source的getBatch返回具体数据的DataFrame；<br>4.在各实现Source的类中，获取对应的流数据，以kafkaSource为例，在getBatch中传入start和end的offset参数，通过kafka metadata，获取各topic的parititon在当前时间要获取的offsetRanges，此工作在driver内执行，然后生成KafkaSourceRDD，传入kafka连接参数和offsetRanges等；<br>5.在RDD的compute方法内，首先调用getOrCreate方法获取CachedKafkaConsumer，并修正offsetRange，生成NextIterator迭代器；<br>6.在迭代器内调用CachedKafkaConsumer的get方法获取ConsumerRecord，在get内调用fetchData方法，此工作在各executor中执行，在 ConsumerRecord内保存着提前从kafka拉取出来的数据fetchedData，数据都是从其内部获取，当fetchedData为空时，调用kafkaConsumer的poll拉取数据填充；不为空拿到record并进行一系列fail的offset判断，正确后返回ConsumerRecord。</p>
-<h2 id="Sink源码调用"><a href="#Sink源码调用" class="headerlink" title="Sink源码调用"></a>Sink源码调用</h2><p><img src="/images/s_sink.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
-<p>Structured Streaming在Sink阶段的调用过程如上图</p>
-<p>1.前两步与Source阶段相同，在调用getBatch方法得到dataframe后，调用Sink的addBatch方法；<br>2.仍然以KafkaSink为例，在addBatch方法内调用KafkaWriter的write方法；<br>3.调用RDD的foreachPartition方法，得到iter后在各个executor中生成KafkaWriteTask执行execute方法；<br>4.通过CachedKafkaProducer.getOrCreate获取producer，在row中获取topic、key、value值，发送。</p>
+        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在博客网站发布markdown格式的博客越来越方便，但发现好多个人博客的样式大都一样，研究发现好多都是使用github+hexo+个人域名，貌似并不复杂，所以尝试搞起。使用Mac + Docker + Hexo + github，由于不想在自己电脑安装过多的东西，所以docker是最好的选择。</p>
+<h1 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h1><h2 id="打包hexo镜像"><a href="#打包hexo镜像" class="headerlink" title="打包hexo镜像"></a>打包hexo镜像</h2><p>在docker官方hub上找了几个hexo的镜像，发现stars和pull的都不太多，在github上查了一下，对几个做了整合，地址分别为<a href="https://github.com/yakumioto/docker-hexo" target="_blank" rel="noopener">docker-hexo</a> 和<a href="https://github.com/neoFelhz/hexo-docker" target="_blank" rel="noopener">hexo-docker</a>。</p>
+<p>最后镜像的Dockerfile如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">FROM node:9.5-alpine</span><br><span class="line"></span><br><span class="line">RUN apk add --update --no-cache git</span><br><span class="line">RUN npm config set unsafe-perm true </span><br><span class="line">	&amp;&amp; npm install hexo-cli -g</span><br><span class="line"></span><br><span class="line">WORKDIR /Hexo</span><br><span class="line"></span><br><span class="line">EXPOSE 4000</span><br></pre></td></tr></table></figure>
+<p>分别使用过ubuntu和centos做过测试，在启动过程中都出现若干问题，有的是在安装nodejs有的是在执行npm，总之对以上问题没有深入解决使用了最后的方案。</p>
+<p>打包镜像完成后，首先初始化，命令如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker run -it \</span><br><span class="line">	-v /hexo:/Hexo \</span><br><span class="line">	li1231/hexo \</span><br><span class="line">	sh -c &apos;hexo init . &amp;&amp; npm install &amp;&amp; npm install hexo-deployer-git --save&apos;</span><br></pre></td></tr></table></figure>
+<p>将初始化的所有结果都保存到外挂目录内，命令执行完后会在hexo初始化目录结构如下</p>
+<pre><code>_config.yml    
+db.json
+node_modules
+package-lock.json
+package.json
+public
+scaffolds
+source
+themes
+</code></pre><p>到此hexo安装成功。</p>
+<h2 id="本地测试"><a href="#本地测试" class="headerlink" title="本地测试"></a>本地测试</h2><p>在source/_posts目录下创建md的文件，也可以使用hexo n创建md文件，使用hexo g命令生成静态页面，使用hexo s生成预览，通过本地访问页面查看效果。因为使用hexo的详细说明特别多，在此不多说。先执行生成命令如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker run -it \</span><br><span class="line">	-v /hexo:/Hexo \</span><br><span class="line">	li1231/hexo \</span><br><span class="line">	hexo g</span><br></pre></td></tr></table></figure>
+<p>再执行预览命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker run -it \</span><br><span class="line">	-p 4000:4000 \</span><br><span class="line">	-v /hexo:/Hexo \</span><br><span class="line">	li1231/hexo \</span><br><span class="line">	hexo s</span><br></pre></td></tr></table></figure>
+<p>开启本机4000端口访问。</p>
+<h2 id="github创建repository"><a href="#github创建repository" class="headerlink" title="github创建repository"></a>github创建repository</h2><p>在github自己账号创建 username.github.io的repository，如果有自己域名可以绑定，此教程网上特别详细，此处省略。</p>
+<h2 id="提交本地博客到github"><a href="#提交本地博客到github" class="headerlink" title="提交本地博客到github"></a>提交本地博客到github</h2><p>将本地的静态页面提交到github，要先修改主配置_config.yml，增加</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  type: git</span><br><span class="line">  repo: https://github.com/username/username.github.io.git</span><br><span class="line">  branch: master</span><br></pre></td></tr></table></figure>
+<p>再执行hexo deploy命令提交</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker run -it \</span><br><span class="line">	-v /hexo:/Hexo \</span><br><span class="line">	li1231/hexo \</span><br><span class="line">	hexo d</span><br></pre></td></tr></table></figure>
+<p>在提交过程中要输入用户名和密码。本以为将本机公钥加到github中，再将.ssh文件夹挂载到docker同时git config –global user.name &amp;&amp; git config –global user.email可以直接免密，但目前还没有成功。</p>
+<p>参考：</p>
+<p><a href="https://www.cnblogs.com/visugar/p/6821777.html" target="_blank" rel="noopener">https://www.cnblogs.com/visugar/p/6821777.html</a></p>
 
       
     </div>
@@ -324,12 +345,6 @@
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/spark/" rel="tag"># spark</a>
-          
-        </div>
-      
 
       
       
@@ -339,18 +354,14 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/06/21/hexo+docker+github/" rel="next" title="Docker部署hexo在github搭建博客">
-                <i class="fa fa-chevron-left"></i> Docker部署hexo在github搭建博客
-              </a>
-            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/06/22/prometheus+spark/" rel="prev" title="prometheus监控spark on yarn方案">
-                prometheus监控spark on yarn方案 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/06/22/source_and_sink/" rel="prev" title="Spark Structured Streaming Source Sink整理">
+                Spark Structured Streaming Source Sink整理 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -474,7 +485,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Source源码调用"><span class="nav-number">1.</span> <span class="nav-text">Source源码调用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Sink源码调用"><span class="nav-number">2.</span> <span class="nav-text">Sink源码调用</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#过程"><span class="nav-number">2.</span> <span class="nav-text">过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#打包hexo镜像"><span class="nav-number">2.1.</span> <span class="nav-text">打包hexo镜像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#本地测试"><span class="nav-number">2.2.</span> <span class="nav-text">本地测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#github创建repository"><span class="nav-number">2.3.</span> <span class="nav-text">github创建repository</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#提交本地博客到github"><span class="nav-number">2.4.</span> <span class="nav-text">提交本地博客到github</span></a></li></ol></li></ol></div>
             
 
           </div>
