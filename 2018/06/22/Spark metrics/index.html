@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="spark," />
 
 
 
@@ -79,13 +79,21 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta name="description" content="概述spark使用metrics的包路径为：org.apache.spark.metrics，核心类：MetricsSystem。可以把Spark Metrics的信息报告到各种各样的Sink，比如HTTP、JMX以及CSV文件。 Spark的Metrics系统目前支持以下的实例：        ○ master：Spark standalone模式的master进程；        ○ work">
+<meta name="keywords" content="spark">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spark metrics整理">
+<meta property="og:url" content="http://yoursite.com/2018/06/22/Spark metrics/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="概述spark使用metrics的包路径为：org.apache.spark.metrics，核心类：MetricsSystem。可以把Spark Metrics的信息报告到各种各样的Sink，比如HTTP、JMX以及CSV文件。 Spark的Metrics系统目前支持以下的实例：        ○ master：Spark standalone模式的master进程；        ○ work">
 <meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/m_source.png">
+<meta property="og:image" content="http://yoursite.com/images/m_sink.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-06-22T09:38:26.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hexo">
+<meta name="twitter:title" content="Spark metrics整理">
+<meta name="twitter:description" content="概述spark使用metrics的包路径为：org.apache.spark.metrics，核心类：MetricsSystem。可以把Spark Metrics的信息报告到各种各样的Sink，比如HTTP、JMX以及CSV文件。 Spark的Metrics系统目前支持以下的实例：        ○ master：Spark standalone模式的master进程；        ○ work">
+<meta name="twitter:image" content="http://yoursite.com/images/m_source.png">
 
 
 
@@ -115,13 +123,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/06/22/Spark metrics/"/>
 
 
 
 
 
-  <title>Hexo</title>
+  <title>Spark metrics整理 | Hexo</title>
   
 
 
@@ -140,8 +148,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-  page-home">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -214,9 +221,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -246,9 +253,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/22/Spark metrics/" itemprop="url">Spark metrics整理</a></h1>
+          <h1 class="post-title" itemprop="name headline">Spark metrics整理</h1>
         
 
         <div class="post-meta">
@@ -298,9 +303,7 @@
       
 
       
-        
-          
-            <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>spark使用metrics的包路径为：org.apache.spark.metrics，核心类：MetricsSystem。可以把Spark Metrics的信息报告到各种各样的Sink，比如HTTP、JMX以及CSV文件。</p>
+        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>spark使用metrics的包路径为：org.apache.spark.metrics，核心类：MetricsSystem。可以把Spark Metrics的信息报告到各种各样的Sink，比如HTTP、JMX以及CSV文件。</p>
 <p>Spark的Metrics系统目前支持以下的实例：<br>        ○ master：Spark standalone模式的master进程；<br>        ○ worker：Spark standalone模式的worker进程；<br>        ○ executor：Spark executor；<br>        ○ driver：Spark driver进程；<br>        ○ applications：master进程里的一个组件，为各种应用作汇报。</p>
 <p>metrics结构主要分为sink和source，source指数据来源，Source内属性包含name和MetricRegistry，主要有：MasterSource、WorkerSource、ApplicationSource、StreamingSource、BlockManagerSource等。</p>
 <p><img src="/images/m_source.png" alt=""></p>
@@ -509,8 +512,6 @@ master.sink.console.unit=seconds
 <p>参考：</p>
 <p><a href="http://hao.jobbole.com/metrics/" target="_blank" rel="noopener">http://hao.jobbole.com/metrics/</a><br><a href="https://www.jianshu.com/p/e4f70ddbc287" target="_blank" rel="noopener">https://www.jianshu.com/p/e4f70ddbc287</a><br><a href="https://www.iteblog.com/archives/1341.html" target="_blank" rel="noopener">https://www.iteblog.com/archives/1341.html</a></p>
 
-          
-        
       
     </div>
     
@@ -525,271 +526,36 @@ master.sink.console.unit=seconds
 
     <footer class="post-footer">
       
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/22/prometheus+spark/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="John Doe">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/22/prometheus+spark/" itemprop="url">prometheus监控spark on yarn方案</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-22T08:35:32+00:00">
-                2018-06-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
+        <div class="post-tags">
           
-
+            <a href="/tags/spark/" rel="tag"># spark</a>
           
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
         </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="监控指标"><a href="#监控指标" class="headerlink" title="监控指标"></a>监控指标</h1><p>使用sparkMetricSink监控的指标</p>
-<h1 id="考虑问题"><a href="#考虑问题" class="headerlink" title="考虑问题"></a>考虑问题</h1><ul>
-<li>spark自带的sink使用io.dropwizard.metrics，目前不支持prometheus</li>
-<li>spark自带的metrics名称格式为：appId.instance.[appName].XX，一旦应用重启，指标就会重置</li>
-<li>spark on yarn目前没有好的办法支持prometheus的动态发现</li>
-</ul>
-<h1 id="开发过程"><a href="#开发过程" class="headerlink" title="开发过程"></a>开发过程</h1><h2 id="1-开发PrometheusMetricsServlet"><a href="#1-开发PrometheusMetricsServlet" class="headerlink" title="1. 开发PrometheusMetricsServlet"></a>1. 开发PrometheusMetricsServlet</h2><p>(1).此类继承spark目前已有的MetricsServlet，MetricsServlet为spark默认开启的sink通过/metrics/json可访问json格式的metrics；并且spark只能开启一个servletsink，所以必须配置中必须指定：*.sink.servlet.class=org.apache.spark.metrics.sink.PrometheusMetricsServlet</p>
-<p>(2). 引入prometheus dropwizard client<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;io.prometheus&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;simpleclient_dropwizard&lt;/artifactId&gt;</span><br><span class="line"> &lt;/dependency&gt;</span><br></pre></td></tr></table></figure></p>
-<p>(3). 在getMetricsSnapshot方法内，将MetricRegistry转换成prometheus的结构，在转换中去掉metrics中key里面的appid，write004方法仿照TextFormat改造；<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">override def getMetricsSnapshot(request: HttpServletRequest): String = &#123;</span><br><span class="line">  val stringWriter = new StringWriter();</span><br><span class="line">  PrometheusMetrics.write004(stringWriter,collectorRegistry.metricFamilySamples())</span><br><span class="line">  stringWriter.close()</span><br><span class="line">  stringWriter.getBuffer.toString</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>(4). 以上修改完成后，启动应用访问yarn_url/proxy/application_XXX_X/metrics/json页面，即可以看到prometheus结构数据</p>
-<h2 id="2-读取yarn信息生成json文件"><a href="#2-读取yarn信息生成json文件" class="headerlink" title="2. 读取yarn信息生成json文件"></a>2. 读取yarn信息生成json文件</h2><p>使用python从yarn读取spark的地址信息，并加上appName标签，按照队列名称生成文件，代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"># coding:utf-8</span><br><span class="line">import json</span><br><span class="line">from httplib import HTTPConnection</span><br><span class="line"></span><br><span class="line">urls = [&quot;rm1.com&quot;, &quot;rm2.com&quot;]</span><br><span class="line">queues = [&quot;queue&quot;]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 解析json获取applications信息</span><br><span class="line">def applications_info(path, method=&quot;GET&quot;):</span><br><span class="line">    for url in urls:</span><br><span class="line">        try:</span><br><span class="line">            conn = HTTPConnection(host=url, port=8088, timeout=3)</span><br><span class="line">            conn.request(method, path)</span><br><span class="line">            response = conn.getresponse()</span><br><span class="line">            jsonobj = json.loads(response.read())</span><br><span class="line">            conn.close()</span><br><span class="line">            if jsonobj:</span><br><span class="line">                return jsonobj[&quot;apps&quot;][&quot;app&quot;]</span><br><span class="line">        except Exception, e:</span><br><span class="line">            # print e</span><br><span class="line">            pass</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    for queue in queues:</span><br><span class="line">        apps = applications_info(</span><br><span class="line">            &quot;/ws/v1/cluster/apps?states=RUNNING&amp;type=spark&amp;queue=&#123;0&#125;&quot;.format(queue))</span><br><span class="line">        result_list = []</span><br><span class="line">        if apps:</span><br><span class="line">            for app in apps:</span><br><span class="line">                appid = app[&quot;id&quot;]</span><br><span class="line">                appname = app[&quot;name&quot;].replace(&quot;-&quot;, &quot;_&quot;)</span><br><span class="line">                trackingUrl = app[&quot;trackingUrl&quot;][7:]</span><br><span class="line">                index = trackingUrl.find(&quot;/&quot;)</span><br><span class="line">                result_list.append(&#123;&quot;targets&quot;: [trackingUrl[0:index]],</span><br><span class="line">                                    &quot;labels&quot;: &#123;&quot;appName&quot;: appname,</span><br><span class="line">                                               &quot;__metrics_path__&quot;: &quot;&#123;0&#125;metrics/json&quot;.format(trackingUrl[index:])&#125;</span><br><span class="line">                                    &#125;)</span><br><span class="line">        print(result_list)</span><br><span class="line">        fo = open(&quot;spark/&#123;0&#125;.json&quot;.format(queue), &quot;w&quot;)</span><br><span class="line">        fo.write(json.dumps(result_list, indent=4))</span><br><span class="line">        fo.close()</span><br></pre></td></tr></table></figure></p>
-<p>生成的json格式如下，因为prometheus的target只能包含ip和port，通过”__metrics_path__” 指定具体访问路径：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        &quot;labels&quot;: &#123;</span><br><span class="line">            &quot;__metrics_path__&quot;:&quot;/proxy/application_XXX_X/metrics/json&quot;,</span><br><span class="line">            &quot;appName&quot;:&quot;app_name&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;targets&quot;: [</span><br><span class="line">            &quot;yarn_url:8088&quot;</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="3-配置prometheus动态文件"><a href="#3-配置prometheus动态文件" class="headerlink" title="3. 配置prometheus动态文件"></a>3. 配置prometheus动态文件</h2><p>prometheus支持多种动态发现配置，此处使用file_sd_configs文件动态发现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">file_sd_configs:</span><br><span class="line">      - files: [&apos;spark/*.json&apos;]</span><br></pre></td></tr></table></figure></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
       
 
       
       
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
       
 
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/22/source_and_sink/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="John Doe">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/22/source_and_sink/" itemprop="url">Spark Structured Streaming Source Sink整理</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
             
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-22T08:35:32+00:00">
-                2018-06-22
-              </time>
+              <a href="/2018/06/22/prometheus+spark/" rel="next" title="prometheus监控spark on yarn方案">
+                <i class="fa fa-chevron-left"></i> prometheus监控spark on yarn方案
+              </a>
             
+          </div>
 
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
             
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
+          </div>
         </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          
-            <h2 id="Source源码调用"><a href="#Source源码调用" class="headerlink" title="Source源码调用"></a>Source源码调用</h2><p><img src="/images/s_source.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
-<p>Structured Streaming在Source阶段的调用过程如上图</p>
-<p>1.在start时会启动StreamExecution内部属性microBatchThread线程，在线程内部调用runBatches方法；<br>2.在方法内执行triggerExecutor.execute调用runBatch方法；<br>3.调用source的getBatch返回具体数据的DataFrame；<br>4.在各实现Source的类中，获取对应的流数据，以kafkaSource为例，在getBatch中传入start和end的offset参数，通过kafka metadata，获取各topic的parititon在当前时间要获取的offsetRanges，此工作在driver内执行，然后生成KafkaSourceRDD，传入kafka连接参数和offsetRanges等；<br>5.在RDD的compute方法内，首先调用getOrCreate方法获取CachedKafkaConsumer，并修正offsetRange，生成NextIterator迭代器；<br>6.在迭代器内调用CachedKafkaConsumer的get方法获取ConsumerRecord，在get内调用fetchData方法，此工作在各executor中执行，在 ConsumerRecord内保存着提前从kafka拉取出来的数据fetchedData，数据都是从其内部获取，当fetchedData为空时，调用kafkaConsumer的poll拉取数据填充；不为空拿到record并进行一系列fail的offset判断，正确后返回ConsumerRecord。</p>
-<h2 id="Sink源码调用"><a href="#Sink源码调用" class="headerlink" title="Sink源码调用"></a>Sink源码调用</h2><p><img src="/images/s_sink.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
-<p>Structured Streaming在Sink阶段的调用过程如上图</p>
-<p>1.前两步与Source阶段相同，在调用getBatch方法得到dataframe后，调用Sink的addBatch方法；<br>2.仍然以KafkaSink为例，在addBatch方法内调用KafkaWriter的write方法；<br>3.调用RDD的foreachPartition方法，得到iter后在各个executor中生成KafkaWriteTask执行execute方法；<br>4.通过CachedKafkaProducer.getOrCreate获取producer，在row中获取topic、key、value值，发送。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </div>
@@ -799,10 +565,11 @@ master.sink.console.unit=seconds
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -810,6 +577,10 @@ master.sink.console.unit=seconds
 
 
           
+
+  
+
+
 
         </div>
         
@@ -830,8 +601,17 @@ master.sink.console.unit=seconds
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -882,6 +662,22 @@ master.sink.console.unit=seconds
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置"><span class="nav-number">2.</span> <span class="nav-text">配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#sink配置参数说明"><span class="nav-number">2.1.</span> <span class="nav-text">sink配置参数说明</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#ConsoleSink-是记录Metrics信息到Console中"><span class="nav-number">2.1.0.0.1.</span> <span class="nav-text">ConsoleSink 是记录Metrics信息到Console中</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#CSVSink-定期的把Metrics信息导出到CSV文件中"><span class="nav-number">2.1.0.0.2.</span> <span class="nav-text">CSVSink  定期的把Metrics信息导出到CSV文件中</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#JmxSink-可以通过JMX方式访问Mertics信息"><span class="nav-number">2.1.0.0.3.</span> <span class="nav-text">JmxSink 可以通过JMX方式访问Mertics信息</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#MetricsServlet"><span class="nav-number">2.1.0.0.4.</span> <span class="nav-text">MetricsServlet</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#GraphiteSink"><span class="nav-number">2.1.0.0.5.</span> <span class="nav-text">GraphiteSink</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#GangliaSink-由于Licene的限制，默认没有放到默认的build里面，如果需要使用，需要自己编译"><span class="nav-number">2.1.0.0.6.</span> <span class="nav-text">GangliaSink 由于Licene的限制，默认没有放到默认的build里面，如果需要使用，需要自己编译</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sink配置样例"><span class="nav-number">2.2.</span> <span class="nav-text">sink配置样例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#source配置样例"><span class="nav-number">2.3.</span> <span class="nav-text">source配置样例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#代码流程"><span class="nav-number">3.</span> <span class="nav-text">代码流程</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -1015,6 +811,10 @@ master.sink.console.unit=seconds
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
