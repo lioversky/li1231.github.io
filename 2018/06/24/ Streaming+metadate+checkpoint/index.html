@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="spark," />
 
 
 
@@ -79,17 +79,23 @@
 
 
 
-<meta name="description" content="背景在博客网站发布markdown格式的博客越来越方便，但发现好多个人博客的样式大都一样，研究发现好多都是使用github+hexo+个人域名，貌似并不复杂，所以尝试搞起。使用Mac + Docker + Hexo + github，由于不想在自己电脑安装过多的东西，所以docker是最好的选择。 过程打包hexo镜像在docker官方hub上找了几个hexo的镜像，发现stars和pull的都不">
+<meta name="description" content="spark streaming的checkpoint目的是保证长时间运行的任务在意外挂掉后保证数据不丢失，checkpoint包含两种数据：metadata和data，本篇主要讨论对metadata的checkpoint。 如何checkpoint 如果要对metadata做checkpoint，首先要有一个可靠的文件系统保证数据的安全性，spark支持hdfs等。通过代码streamingCon">
+<meta name="keywords" content="spark">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Docker部署hexo在github搭建博客">
-<meta property="og:url" content="http://li1231.com/2018/06/21/hexo+docker+github/index.html">
+<meta property="og:title" content="Streaming metadate checkpoint详解">
+<meta property="og:url" content="http://li1231.com/2018/06/24/ Streaming+metadate+checkpoint/index.html">
 <meta property="og:site_name" content="li1231">
-<meta property="og:description" content="背景在博客网站发布markdown格式的博客越来越方便，但发现好多个人博客的样式大都一样，研究发现好多都是使用github+hexo+个人域名，貌似并不复杂，所以尝试搞起。使用Mac + Docker + Hexo + github，由于不想在自己电脑安装过多的东西，所以docker是最好的选择。 过程打包hexo镜像在docker官方hub上找了几个hexo的镜像，发现stars和pull的都不">
+<meta property="og:description" content="spark streaming的checkpoint目的是保证长时间运行的任务在意外挂掉后保证数据不丢失，checkpoint包含两种数据：metadata和data，本篇主要讨论对metadata的checkpoint。 如何checkpoint 如果要对metadata做checkpoint，首先要有一个可靠的文件系统保证数据的安全性，spark支持hdfs等。通过代码streamingCon">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-06-22T15:38:57.000Z">
+<meta property="og:image" content="http://li1231.com/images/checkpoint1.png">
+<meta property="og:image" content="http://li1231.com/images/checkpoint2.png">
+<meta property="og:image" content="http://li1231.com/images/checkpoint3.png">
+<meta property="og:image" content="http://li1231.com/images/checkpoint4.png">
+<meta property="og:updated_time" content="2018-06-24T12:33:58.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Docker部署hexo在github搭建博客">
-<meta name="twitter:description" content="背景在博客网站发布markdown格式的博客越来越方便，但发现好多个人博客的样式大都一样，研究发现好多都是使用github+hexo+个人域名，貌似并不复杂，所以尝试搞起。使用Mac + Docker + Hexo + github，由于不想在自己电脑安装过多的东西，所以docker是最好的选择。 过程打包hexo镜像在docker官方hub上找了几个hexo的镜像，发现stars和pull的都不">
+<meta name="twitter:title" content="Streaming metadate checkpoint详解">
+<meta name="twitter:description" content="spark streaming的checkpoint目的是保证长时间运行的任务在意外挂掉后保证数据不丢失，checkpoint包含两种数据：metadata和data，本篇主要讨论对metadata的checkpoint。 如何checkpoint 如果要对metadata做checkpoint，首先要有一个可靠的文件系统保证数据的安全性，spark支持hdfs等。通过代码streamingCon">
+<meta name="twitter:image" content="http://li1231.com/images/checkpoint1.png">
 
 
 
@@ -119,13 +125,13 @@
 
 
 
-  <link rel="canonical" href="http://li1231.com/2018/06/21/hexo+docker+github/"/>
+  <link rel="canonical" href="http://li1231.com/2018/06/24/ Streaming+metadate+checkpoint/"/>
 
 
 
 
 
-  <title>Docker部署hexo在github搭建博客 | li1231</title>
+  <title>Streaming metadate checkpoint详解 | li1231</title>
   
 
 
@@ -232,7 +238,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://li1231.com/2018/06/21/hexo+docker+github/">
+    <link itemprop="mainEntityOfPage" href="http://li1231.com/2018/06/24/ Streaming+metadate+checkpoint/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="li1231">
@@ -249,7 +255,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Docker部署hexo在github搭建博客</h1>
+          <h1 class="post-title" itemprop="name headline">Streaming metadate checkpoint详解</h1>
         
 
         <div class="post-meta">
@@ -261,8 +267,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-21T16:00:00+00:00">
-                2018-06-22
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-24T20:30:00+08:00">
+                2018-06-24
               </time>
             
 
@@ -299,37 +305,30 @@
       
 
       
-        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在博客网站发布markdown格式的博客越来越方便，但发现好多个人博客的样式大都一样，研究发现好多都是使用github+hexo+个人域名，貌似并不复杂，所以尝试搞起。使用Mac + Docker + Hexo + github，由于不想在自己电脑安装过多的东西，所以docker是最好的选择。</p>
-<h1 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h1><h2 id="打包hexo镜像"><a href="#打包hexo镜像" class="headerlink" title="打包hexo镜像"></a>打包hexo镜像</h2><p>在docker官方hub上找了几个hexo的镜像，发现stars和pull的都不太多，在github上查了一下，对几个做了整合，地址分别为<a href="https://github.com/yakumioto/docker-hexo" target="_blank" rel="noopener">docker-hexo</a> 和<a href="https://github.com/neoFelhz/hexo-docker" target="_blank" rel="noopener">hexo-docker</a>。</p>
-<p>最后镜像的Dockerfile如下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">FROM node:9.5-alpine</span><br><span class="line"></span><br><span class="line">RUN apk add --update --no-cache git</span><br><span class="line">RUN npm config set unsafe-perm true </span><br><span class="line">	&amp;&amp; npm install hexo-cli -g</span><br><span class="line"></span><br><span class="line">WORKDIR /Hexo</span><br><span class="line"></span><br><span class="line">EXPOSE 4000</span><br></pre></td></tr></table></figure>
-<p>分别使用过ubuntu和centos做过测试，在启动过程中都出现若干问题，有的是在安装nodejs有的是在执行npm，总之对以上问题没有深入解决使用了最后的方案。</p>
-<p>打包镜像完成后，首先初始化，命令如下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker run -it \</span><br><span class="line">	-v /hexo:/Hexo \</span><br><span class="line">	li1231/hexo \</span><br><span class="line">	sh -c &apos;hexo init . &amp;&amp; npm install &amp;&amp; npm install hexo-deployer-git --save&apos;</span><br></pre></td></tr></table></figure>
-<p>将初始化的所有结果都保存到外挂目录内，命令执行完后会在hexo初始化目录结构如下</p>
-<pre><code>_config.yml    
-db.json
-node_modules
-package-lock.json
-package.json
-public
-scaffolds
-source
-themes
-</code></pre><p>到此hexo安装成功。</p>
-<h2 id="本地测试"><a href="#本地测试" class="headerlink" title="本地测试"></a>本地测试</h2><p>在source/_posts目录下创建md的文件，也可以使用hexo n创建md文件，使用hexo g命令生成静态页面，使用hexo s生成预览，通过本地访问页面查看效果。因为使用hexo的详细说明特别多，在此不多说。先执行生成命令如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker run -it \</span><br><span class="line">	-v /hexo:/Hexo \</span><br><span class="line">	li1231/hexo \</span><br><span class="line">	hexo g</span><br></pre></td></tr></table></figure>
-<p>再执行预览命令：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker run -it \</span><br><span class="line">	-p 4000:4000 \</span><br><span class="line">	-v /hexo:/Hexo \</span><br><span class="line">	li1231/hexo \</span><br><span class="line">	hexo s</span><br></pre></td></tr></table></figure>
-<p>开启本机4000端口访问。</p>
-<h2 id="github创建repository"><a href="#github创建repository" class="headerlink" title="github创建repository"></a>github创建repository</h2><p>在github自己账号创建 username.github.io的repository，如果有自己域名可以绑定，此教程网上特别详细，此处省略。</p>
-<h2 id="提交本地博客到github"><a href="#提交本地博客到github" class="headerlink" title="提交本地博客到github"></a>提交本地博客到github</h2><p>将本地的静态页面提交到github，要先修改主配置_config.yml，增加</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  type: git</span><br><span class="line">  repo: https://github.com/username/username.github.io.git</span><br><span class="line">  branch: master</span><br></pre></td></tr></table></figure>
-<p>再执行hexo deploy命令提交</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker run -it \</span><br><span class="line">	-v /hexo:/Hexo \</span><br><span class="line">	li1231/hexo \</span><br><span class="line">	hexo d</span><br></pre></td></tr></table></figure>
-<p>在提交过程中要输入用户名和密码。本以为将本机公钥加到github中，再将.ssh文件夹挂载到docker同时git config –global user.name &amp;&amp; git config –global user.email可以直接免密，但目前还没有成功。</p>
-<p>参考：</p>
-<p><a href="https://www.cnblogs.com/visugar/p/6821777.html" target="_blank" rel="noopener">https://www.cnblogs.com/visugar/p/6821777.html</a></p>
+        <p><font size="4">spark streaming的checkpoint目的是保证长时间运行的任务在意外挂掉后保证数据不丢失，checkpoint包含两种数据：metadata和data，本篇主要讨论对metadata的checkpoint。</font></p>
+<h1 id="如何checkpoint"><a href="#如何checkpoint" class="headerlink" title="如何checkpoint"></a>如何checkpoint</h1><ol>
+<li>如果要对metadata做checkpoint，首先要有一个可靠的文件系统保证数据的安全性，spark支持hdfs等。通过代码streamingContext.checkpoint(checkpointDirectory)指定具体的存储路径；</li>
+<li>jobGenerator在每一个batch时间后调用generateJobs方法，在jobScheduler.submitJobSet提交任务后，执行doCheckpoint方法来保存metadata；</li>
+<li>doCheckpoint方法中先判断是否需要checkpoint，条件为ssc.checkpointDuration != null &amp;&amp; ssc.checkpointDir != null，最重要的是指定后面的ssc.checkpointDir指定路径，再判断是否到时间，如果满足条件进行正式代码；</li>
+<li>通过ssc.graph.updateCheckpointData(time)调用DStream的updateCheckpointData，从而执行每个DStream子类的checkpointData.update(currentTime)，以DirectKafkaInputDStream为例，最后执行的是DirectKafkaInputDStreamCheckpointData的update，目的是更新要持久的源数据checkpointData.data；通过dependencies.foreach(_.updateCheckpointData(currentTime))使所有依赖的DStream执行；<img src="/images/checkpoint1.png" alt=""></li>
+<li>所有DStream都执行完update后，执行CheckpointWriter.write(new Checkpoint(ssc, time), clearCheckpointDataLater)，本次batchcheckpoint完成；</li>
+<li>当jobGenerator接收到batch完成事件后，通过jobGenerator.onBatchCompletion(jobSet.time)调用clearMetadata方法，最后执行DStream的clearMetadata删除generatedRDDs的过期RDD的metadata。</li>
+</ol>
+<h1 id="如何恢复"><a href="#如何恢复" class="headerlink" title="如何恢复"></a>如何恢复</h1><ol>
+<li>要从checkpoint中恢复，在创建StreamingContext时略有不同，代码如图<img src="/images/checkpoint2.png" alt=""></li>
+<li>StreamingContext的getOrCreate方法中，先通过CheckpointReader.read( checkpointPath, new SparkConf(), hadoopConf, createOnError)反序列化出Checkpoint，如果Checkpoint不为空即路径存在且有数据，使用StreamingContext(null, _, null)构造方法创建StreamingContext；</li>
+<li>StreamingContext.start后，在使用DStreamGraph的实例时时会判断此实例为新创建或从checkpoint中恢复，如从checkpoint中恢复，则执行graph.restoreCheckpointData(),通过DStream的restoreCheckpointData最终调用DStream子类内部的DStreamCheckpointData.restore将保存的RDD metadata写回到generatedRDDs里；</li>
+<li>同时jobGenerator在start时，判断ssc.isCheckpointPresent，实际就是判断ssc里面的cp_是否有值从而执行restart方法。restart方法首先从checkpoint的时间开始恢复任务，然后生成从最后时间到restartTime时间序列；<img src="/images/checkpoint3.png" alt=""></li>
+<li>调用graph.generateJobs生成job，在方法内会调用DStream的generateJobs时，在getOrCompute方法通过上面还原的generatedRDDs获取对应时间的RDD源数据信息，如果没有再重新生成，最后提交任务。<img src="/images/checkpoint4.png" alt=""></li>
+</ol>
+<h1 id="创建与恢复区别"><a href="#创建与恢复区别" class="headerlink" title="创建与恢复区别"></a>创建与恢复区别</h1><ol>
+<li><p>先看一下Checkpoint中包括哪些信息：</p>
+   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">val master = ssc.sc.master</span><br><span class="line">val framework = ssc.sc.appName</span><br><span class="line">val jars = ssc.sc.jars</span><br><span class="line">val graph = ssc.graph</span><br><span class="line">val checkpointDir = ssc.checkpointDir</span><br><span class="line">val checkpointDuration = ssc.checkpointDuration</span><br><span class="line">val pendingTimes = ssc.scheduler.getPendingTimes().toArray</span><br><span class="line">val delaySeconds = MetadataCleaner.getDelaySeconds(ssc.conf)</span><br><span class="line">val sparkConfPairs = ssc.conf.getAll</span><br></pre></td></tr></table></figure>
+<p> 以上数据都是通过反序列化恢复得到的，对新程序的所有的配置都不会生效，比如队列、资源数等。</p>
+</li>
+<li>恢复checkpoint时，从文件系统反序列化数据成CheckPoint的具体代码为Checkpoint.deserialize(fis, conf)，所以还原的信息要与当前编译的serialVersion一致，否则会出现异常</li>
+<li>在jobGenerator中，新创建的StreamingContext调用的是startFirstTime方法，会初始化DStream的一些数据；而checkpoint恢复调用的是restart。</li>
+</ol>
 
       
     </div>
@@ -345,6 +344,12 @@ themes
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/spark/" rel="tag"># spark</a>
+          
+        </div>
+      
 
       
       
@@ -354,15 +359,15 @@ themes
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2018/06/22/Spark_metrics/" rel="next" title="Spark metrics整理">
+                <i class="fa fa-chevron-left"></i> Spark metrics整理
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/06/22/prometheus+spark/" rel="prev" title="prometheus监控spark on yarn方案">
-                prometheus监控spark on yarn方案 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -485,7 +490,7 @@ themes
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#过程"><span class="nav-number">2.</span> <span class="nav-text">过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#打包hexo镜像"><span class="nav-number">2.1.</span> <span class="nav-text">打包hexo镜像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#本地测试"><span class="nav-number">2.2.</span> <span class="nav-text">本地测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#github创建repository"><span class="nav-number">2.3.</span> <span class="nav-text">github创建repository</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#提交本地博客到github"><span class="nav-number">2.4.</span> <span class="nav-text">提交本地博客到github</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#如何checkpoint"><span class="nav-number">1.</span> <span class="nav-text">如何checkpoint</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何恢复"><span class="nav-number">2.</span> <span class="nav-text">如何恢复</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#创建与恢复区别"><span class="nav-number">3.</span> <span class="nav-text">创建与恢复区别</span></a></li></ol></div>
             
 
           </div>
