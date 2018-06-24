@@ -260,7 +260,7 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-24T12:30:00+00:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-24T20:30:00+08:00">
                 2018-06-24
               </time>
             
@@ -699,131 +699,6 @@ master.sink.console.unit=seconds
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://li1231.com/2018/06/22/source_and_sink/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="li1231">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="li1231">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/06/22/source_and_sink/" itemprop="url">Spark Structured Streaming Source Sink整理</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-22T08:35:32+08:00">
-                2018-06-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="Source源码调用"><a href="#Source源码调用" class="headerlink" title="Source源码调用"></a>Source源码调用</h2><p><img src="/images/s_source.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
-<p>Structured Streaming在Source阶段的调用过程如上图</p>
-<p>1.在start时会启动StreamExecution内部属性microBatchThread线程，在线程内部调用runBatches方法；<br>2.在方法内执行triggerExecutor.execute调用runBatch方法；<br>3.调用source的getBatch返回具体数据的DataFrame；<br>4.在各实现Source的类中，获取对应的流数据，以kafkaSource为例，在getBatch中传入start和end的offset参数，通过kafka metadata，获取各topic的parititon在当前时间要获取的offsetRanges，此工作在driver内执行，然后生成KafkaSourceRDD，传入kafka连接参数和offsetRanges等；<br>5.在RDD的compute方法内，首先调用getOrCreate方法获取CachedKafkaConsumer，并修正offsetRange，生成NextIterator迭代器；<br>6.在迭代器内调用CachedKafkaConsumer的get方法获取ConsumerRecord，在get内调用fetchData方法，此工作在各executor中执行，在 ConsumerRecord内保存着提前从kafka拉取出来的数据fetchedData，数据都是从其内部获取，当fetchedData为空时，调用kafkaConsumer的poll拉取数据填充；不为空拿到record并进行一系列fail的offset判断，正确后返回ConsumerRecord。</p>
-<h2 id="Sink源码调用"><a href="#Sink源码调用" class="headerlink" title="Sink源码调用"></a>Sink源码调用</h2><p><img src="/images/s_sink.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
-<p>Structured Streaming在Sink阶段的调用过程如上图</p>
-<p>1.前两步与Source阶段相同，在调用getBatch方法得到dataframe后，调用Sink的addBatch方法；<br>2.仍然以KafkaSink为例，在addBatch方法内调用KafkaWriter的write方法；<br>3.调用RDD的foreachPartition方法，得到iter后在各个executor中生成KafkaWriteTask执行execute方法；<br>4.通过CachedKafkaProducer.getOrCreate获取producer，在row中获取topic、key、value值，发送。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://li1231.com/2018/06/22/prometheus+spark/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -908,6 +783,131 @@ master.sink.console.unit=seconds
 <h2 id="2-读取yarn信息生成json文件"><a href="#2-读取yarn信息生成json文件" class="headerlink" title="2. 读取yarn信息生成json文件"></a>2. 读取yarn信息生成json文件</h2><p>使用python从yarn读取spark的地址信息，并加上appName标签，按照队列名称生成文件，代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"># coding:utf-8</span><br><span class="line">import json</span><br><span class="line">from httplib import HTTPConnection</span><br><span class="line"></span><br><span class="line">urls = [&quot;rm1.com&quot;, &quot;rm2.com&quot;]</span><br><span class="line">queues = [&quot;queue&quot;]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 解析json获取applications信息</span><br><span class="line">def applications_info(path, method=&quot;GET&quot;):</span><br><span class="line">    for url in urls:</span><br><span class="line">        try:</span><br><span class="line">            conn = HTTPConnection(host=url, port=8088, timeout=3)</span><br><span class="line">            conn.request(method, path)</span><br><span class="line">            response = conn.getresponse()</span><br><span class="line">            jsonobj = json.loads(response.read())</span><br><span class="line">            conn.close()</span><br><span class="line">            if jsonobj:</span><br><span class="line">                return jsonobj[&quot;apps&quot;][&quot;app&quot;]</span><br><span class="line">        except Exception, e:</span><br><span class="line">            # print e</span><br><span class="line">            pass</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    for queue in queues:</span><br><span class="line">        apps = applications_info(</span><br><span class="line">            &quot;/ws/v1/cluster/apps?states=RUNNING&amp;type=spark&amp;queue=&#123;0&#125;&quot;.format(queue))</span><br><span class="line">        result_list = []</span><br><span class="line">        if apps:</span><br><span class="line">            for app in apps:</span><br><span class="line">                appid = app[&quot;id&quot;]</span><br><span class="line">                appname = app[&quot;name&quot;].replace(&quot;-&quot;, &quot;_&quot;)</span><br><span class="line">                trackingUrl = app[&quot;trackingUrl&quot;][7:]</span><br><span class="line">                index = trackingUrl.find(&quot;/&quot;)</span><br><span class="line">                result_list.append(&#123;&quot;targets&quot;: [trackingUrl[0:index]],</span><br><span class="line">                                    &quot;labels&quot;: &#123;&quot;appName&quot;: appname,</span><br><span class="line">                                               &quot;__metrics_path__&quot;: &quot;&#123;0&#125;metrics/json&quot;.format(trackingUrl[index:])&#125;</span><br><span class="line">                                    &#125;)</span><br><span class="line">        print(result_list)</span><br><span class="line">        fo = open(&quot;spark/&#123;0&#125;.json&quot;.format(queue), &quot;w&quot;)</span><br><span class="line">        fo.write(json.dumps(result_list, indent=4))</span><br><span class="line">        fo.close()</span><br></pre></td></tr></table></figure></p>
 <p>生成的json格式如下，因为prometheus的target只能包含ip和port，通过”__metrics_path__” 指定具体访问路径：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        &quot;labels&quot;: &#123;</span><br><span class="line">            &quot;__metrics_path__&quot;:&quot;/proxy/application_XXX_X/metrics/json&quot;,</span><br><span class="line">            &quot;appName&quot;:&quot;app_name&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;targets&quot;: [</span><br><span class="line">            &quot;yarn_url:8088&quot;</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <h2 id="3-配置prometheus动态文件"><a href="#3-配置prometheus动态文件" class="headerlink" title="3. 配置prometheus动态文件"></a>3. 配置prometheus动态文件</h2><p>prometheus支持多种动态发现配置，此处使用file_sd_configs文件动态发现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">file_sd_configs:</span><br><span class="line">      - files: [&apos;spark/*.json&apos;]</span><br></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://li1231.com/2018/06/22/source_and_sink/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="li1231">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="li1231">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/22/source_and_sink/" itemprop="url">Spark Structured Streaming Source Sink整理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-22T08:35:32+08:00">
+                2018-06-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Source源码调用"><a href="#Source源码调用" class="headerlink" title="Source源码调用"></a>Source源码调用</h2><p><img src="/images/s_source.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>Structured Streaming在Source阶段的调用过程如上图</p>
+<p>1.在start时会启动StreamExecution内部属性microBatchThread线程，在线程内部调用runBatches方法；<br>2.在方法内执行triggerExecutor.execute调用runBatch方法；<br>3.调用source的getBatch返回具体数据的DataFrame；<br>4.在各实现Source的类中，获取对应的流数据，以kafkaSource为例，在getBatch中传入start和end的offset参数，通过kafka metadata，获取各topic的parititon在当前时间要获取的offsetRanges，此工作在driver内执行，然后生成KafkaSourceRDD，传入kafka连接参数和offsetRanges等；<br>5.在RDD的compute方法内，首先调用getOrCreate方法获取CachedKafkaConsumer，并修正offsetRange，生成NextIterator迭代器；<br>6.在迭代器内调用CachedKafkaConsumer的get方法获取ConsumerRecord，在get内调用fetchData方法，此工作在各executor中执行，在 ConsumerRecord内保存着提前从kafka拉取出来的数据fetchedData，数据都是从其内部获取，当fetchedData为空时，调用kafkaConsumer的poll拉取数据填充；不为空拿到record并进行一系列fail的offset判断，正确后返回ConsumerRecord。</p>
+<h2 id="Sink源码调用"><a href="#Sink源码调用" class="headerlink" title="Sink源码调用"></a>Sink源码调用</h2><p><img src="/images/s_sink.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>Structured Streaming在Sink阶段的调用过程如上图</p>
+<p>1.前两步与Source阶段相同，在调用getBatch方法得到dataframe后，调用Sink的addBatch方法；<br>2.仍然以KafkaSink为例，在addBatch方法内调用KafkaWriter的write方法；<br>3.调用RDD的foreachPartition方法，得到iter后在各个executor中生成KafkaWriteTask执行execute方法；<br>4.通过CachedKafkaProducer.getOrCreate获取producer，在row中获取topic、key、value值，发送。</p>
 
           
         
