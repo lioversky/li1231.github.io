@@ -5,7 +5,7 @@
   
 
 
-<html class="theme-next muse use-motion" lang="zh-CN">
+<html class="theme-next gemini use-motion" lang="zh-CN">
 <head>
   <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="li1231">
 <meta property="og:description" content="监控指标使用sparkMetricSink监控的指标 考虑问题 spark自带的sink使用io.dropwizard.metrics，目前不支持prometheus spark自带的metrics名称格式为：appId.instance.[appName].XX，一旦应用重启，指标就会重置 spark on yarn目前没有好的办法支持prometheus的动态发现  开发过程1. 开发Prom">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-06-24T12:40:06.000Z">
+<meta property="og:updated_time" content="2018-06-24T14:37:11.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="prometheus监控spark on yarn方案">
 <meta name="twitter:description" content="监控指标使用sparkMetricSink监控的指标 考虑问题 spark自带的sink使用io.dropwizard.metrics，目前不支持prometheus spark自带的metrics名称格式为：appId.instance.[appName].XX，一旦应用重启，指标就会重置 spark on yarn目前没有好的办法支持prometheus的动态发现  开发过程1. 开发Prom">
@@ -98,7 +98,7 @@
   var NexT = window.NexT || {};
   var CONFIG = {
     root: '/',
-    scheme: 'Muse',
+    scheme: 'Gemini',
     version: '5.1.4',
     sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
     fancybox: true,
@@ -191,12 +191,22 @@
         </li>
       
         
-        <li class="menu-item menu-item-archives">
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archive">
           <a href="/archives/" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
             
-            Archives
+            archive
           </a>
         </li>
       
@@ -273,6 +283,28 @@
           </span>
 
           
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -343,8 +375,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/06/22/source_and_sink/" rel="next" title="Spark Structured Streaming Source Sink整理">
-                <i class="fa fa-chevron-left"></i> Spark Structured Streaming Source Sink整理
+              <a href="/2018/06/21/hexo+docker+github/" rel="next" title="Docker部署hexo在github搭建博客">
+                <i class="fa fa-chevron-left"></i> Docker部署hexo在github搭建博客
               </a>
             
           </div>
@@ -353,8 +385,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/06/22/Spark_metrics/" rel="prev" title="Spark metrics整理">
-                Spark metrics整理 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/06/22/source_and_sink/" rel="prev" title="Spark Structured Streaming Source Sink整理">
+                Spark Structured Streaming Source Sink整理 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -430,7 +462,7 @@
             
               <div class="site-state-item site-state-posts">
               
-                <a href="/archives/">
+                <a href="/archives">
               
                   <span class="site-state-item-count">5</span>
                   <span class="site-state-item-name">posts</span>
@@ -439,15 +471,24 @@
             
 
             
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
 
             
               
               
               <div class="site-state-item site-state-tags">
-                
-                  <span class="site-state-item-count">1</span>
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">2</span>
                   <span class="site-state-item-name">tags</span>
-                
+                </a>
               </div>
             
 
@@ -455,6 +496,22 @@
 
           
 
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/lioversky" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://weibo.com/lioversky" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>微博</a>
+                  </span>
+                
+            </div>
           
 
           
@@ -516,7 +573,7 @@
 
 
 
-  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
 
 
 
@@ -615,6 +672,13 @@
 
   
   
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
 
   
   <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
