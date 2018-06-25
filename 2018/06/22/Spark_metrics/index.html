@@ -79,20 +79,20 @@
 
 
 
-<meta name="description" content="概述spark使用metrics的包路径为：org.apache.spark.metrics，核心类：MetricsSystem。可以把Spark Metrics的信息报告到各种各样的Sink，比如HTTP、JMX以及CSV文件。 Spark的Metrics系统目前支持以下的实例：        ○ master：Spark standalone模式的master进程；        ○ work">
+<meta name="description" content="概述spark使用metrics的包路径为：org.apache.spark.metrics，核心类：MetricsSystem。可以把Spark Metrics的信息报告到各种各样的Sink，比如HTTP、JMX以及CSV文件。">
 <meta name="keywords" content="spark">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spark metrics整理">
 <meta property="og:url" content="http://li1231.com/2018/06/22/Spark_metrics/index.html">
 <meta property="og:site_name" content="li1231">
-<meta property="og:description" content="概述spark使用metrics的包路径为：org.apache.spark.metrics，核心类：MetricsSystem。可以把Spark Metrics的信息报告到各种各样的Sink，比如HTTP、JMX以及CSV文件。 Spark的Metrics系统目前支持以下的实例：        ○ master：Spark standalone模式的master进程；        ○ work">
+<meta property="og:description" content="概述spark使用metrics的包路径为：org.apache.spark.metrics，核心类：MetricsSystem。可以把Spark Metrics的信息报告到各种各样的Sink，比如HTTP、JMX以及CSV文件。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://li1231.com/images/m_source.png">
 <meta property="og:image" content="http://li1231.com/images/m_sink.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2018-06-24T14:36:05.000Z">
+<meta property="og:updated_time" content="2018-06-25T07:12:52.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spark metrics整理">
-<meta name="twitter:description" content="概述spark使用metrics的包路径为：org.apache.spark.metrics，核心类：MetricsSystem。可以把Spark Metrics的信息报告到各种各样的Sink，比如HTTP、JMX以及CSV文件。 Spark的Metrics系统目前支持以下的实例：        ○ master：Spark standalone模式的master进程；        ○ work">
+<meta name="twitter:description" content="概述spark使用metrics的包路径为：org.apache.spark.metrics，核心类：MetricsSystem。可以把Spark Metrics的信息报告到各种各样的Sink，比如HTTP、JMX以及CSV文件。">
 <meta name="twitter:image" content="http://li1231.com/images/m_source.png">
 
 
@@ -200,6 +200,16 @@
               <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
             
             标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
           </a>
         </li>
       
@@ -336,6 +346,7 @@
 
       
         <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>spark使用metrics的包路径为：org.apache.spark.metrics，核心类：MetricsSystem。可以把Spark Metrics的信息报告到各种各样的Sink，比如HTTP、JMX以及CSV文件。</p>
+<a id="more"></a>
 <p>Spark的Metrics系统目前支持以下的实例：<br>        ○ master：Spark standalone模式的master进程；<br>        ○ worker：Spark standalone模式的worker进程；<br>        ○ executor：Spark executor；<br>        ○ driver：Spark driver进程；<br>        ○ applications：master进程里的一个组件，为各种应用作汇报。</p>
 <p>metrics结构主要分为sink和source，source指数据来源，Source内属性包含name和MetricRegistry，主要有：MasterSource、WorkerSource、ApplicationSource、StreamingSource、BlockManagerSource等。</p>
 <p><img src="/images/m_source.png" alt=""></p>
@@ -662,7 +673,7 @@ master.sink.console.unit=seconds
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

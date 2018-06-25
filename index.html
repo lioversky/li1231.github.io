@@ -197,6 +197,16 @@
         </li>
       
         
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
         <li class="menu-item menu-item-archives">
           <a href="/archives/" rel="section">
             
@@ -225,6 +235,157 @@
           <div id="content" class="content">
             
   <section id="posts" class="posts-expand">
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://li1231.com/2018/06/25/hexo_nexT_config/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="li1231">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="li1231">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/06/25/hexo_nexT_config/" itemprop="url">hexo使用nexT主题修改参数整理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-25T15:30:00+08:00">
+                2018-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <ul>
+<li><strong>主页显示预览</strong></li>
+</ul>
+<p>修改主题配置文件，找到如下内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># Automatically Excerpt. Not recommend.</span><br><span class="line"># Please use &lt;!-- more --&gt; in the post to control excerpt accurately.</span><br><span class="line">auto_excerpt:</span><br><span class="line">  enable: false</span><br><span class="line">  length: 150</span><br></pre></td></tr></table></figure>
+<p>enable表示是否开启摘录，默认为false，length表示摘录字数。<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/06/25/hexo_nexT_config/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
     
       
 
@@ -331,33 +492,14 @@
 
       
         
-          
-            <p><font size="4">spark streaming的checkpoint目的是保证长时间运行的任务在意外挂掉后保证数据不丢失，checkpoint包含两种数据：metadata和data，本篇主要讨论对metadata的checkpoint。</font></p>
-<h1 id="如何checkpoint"><a href="#如何checkpoint" class="headerlink" title="如何checkpoint"></a>如何checkpoint</h1><ol>
-<li>如果要对metadata做checkpoint，首先要有一个可靠的文件系统保证数据的安全性，spark支持hdfs等。通过代码streamingContext.checkpoint(checkpointDirectory)指定具体的存储路径；</li>
-<li>jobGenerator在每一个batch时间后调用generateJobs方法，在jobScheduler.submitJobSet提交任务后，执行doCheckpoint方法来保存metadata；</li>
-<li>doCheckpoint方法中先判断是否需要checkpoint，条件为ssc.checkpointDuration != null &amp;&amp; ssc.checkpointDir != null，最重要的是指定后面的ssc.checkpointDir指定路径，再判断是否到时间，如果满足条件进行正式代码；</li>
-<li>通过ssc.graph.updateCheckpointData(time)调用DStream的updateCheckpointData，从而执行每个DStream子类的checkpointData.update(currentTime)，以DirectKafkaInputDStream为例，最后执行的是DirectKafkaInputDStreamCheckpointData的update，目的是更新要持久的源数据checkpointData.data；通过dependencies.foreach(_.updateCheckpointData(currentTime))使所有依赖的DStream执行；<img src="/images/checkpoint1.png" alt=""></li>
-<li>所有DStream都执行完update后，执行CheckpointWriter.write(new Checkpoint(ssc, time), clearCheckpointDataLater)，本次batchcheckpoint完成；</li>
-<li>当jobGenerator接收到batch完成事件后，通过jobGenerator.onBatchCompletion(jobSet.time)调用clearMetadata方法，最后执行DStream的clearMetadata删除generatedRDDs的过期RDD的metadata。</li>
-</ol>
-<h1 id="如何恢复"><a href="#如何恢复" class="headerlink" title="如何恢复"></a>如何恢复</h1><ol>
-<li>要从checkpoint中恢复，在创建StreamingContext时略有不同，代码如图<img src="/images/checkpoint2.png" alt=""></li>
-<li>StreamingContext的getOrCreate方法中，先通过CheckpointReader.read( checkpointPath, new SparkConf(), hadoopConf, createOnError)反序列化出Checkpoint，如果Checkpoint不为空即路径存在且有数据，使用StreamingContext(null, _, null)构造方法创建StreamingContext；</li>
-<li>StreamingContext.start后，在使用DStreamGraph的实例时时会判断此实例为新创建或从checkpoint中恢复，如从checkpoint中恢复，则执行graph.restoreCheckpointData(),通过DStream的restoreCheckpointData最终调用DStream子类内部的DStreamCheckpointData.restore将保存的RDD metadata写回到generatedRDDs里；</li>
-<li>同时jobGenerator在start时，判断ssc.isCheckpointPresent，实际就是判断ssc里面的cp_是否有值从而执行restart方法。restart方法首先从checkpoint的时间开始恢复任务，然后生成从最后时间到restartTime时间序列；<img src="/images/checkpoint3.png" alt=""></li>
-<li>调用graph.generateJobs生成job，在方法内会调用DStream的generateJobs时，在getOrCompute方法通过上面还原的generatedRDDs获取对应时间的RDD源数据信息，如果没有再重新生成，最后提交任务。<img src="/images/checkpoint4.png" alt=""></li>
-</ol>
-<h1 id="创建与恢复区别"><a href="#创建与恢复区别" class="headerlink" title="创建与恢复区别"></a>创建与恢复区别</h1><ol>
-<li><p>先看一下Checkpoint中包括哪些信息：</p>
-   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">val master = ssc.sc.master</span><br><span class="line">val framework = ssc.sc.appName</span><br><span class="line">val jars = ssc.sc.jars</span><br><span class="line">val graph = ssc.graph</span><br><span class="line">val checkpointDir = ssc.checkpointDir</span><br><span class="line">val checkpointDuration = ssc.checkpointDuration</span><br><span class="line">val pendingTimes = ssc.scheduler.getPendingTimes().toArray</span><br><span class="line">val delaySeconds = MetadataCleaner.getDelaySeconds(ssc.conf)</span><br><span class="line">val sparkConfPairs = ssc.conf.getAll</span><br></pre></td></tr></table></figure>
-<p> 以上数据都是通过反序列化恢复得到的，对新程序的所有的配置都不会生效，比如队列、资源数等。</p>
-</li>
-<li>恢复checkpoint时，从文件系统反序列化数据成CheckPoint的具体代码为Checkpoint.deserialize(fis, conf)，所以还原的信息要与当前编译的serialVersion一致，否则会出现异常</li>
-<li>在jobGenerator中，新创建的StreamingContext调用的是startFirstTime方法，会初始化DStream的一些数据；而checkpoint恢复调用的是restart。</li>
-</ol>
-
-          
+          <p><font size="4">spark streaming的checkpoint目的是保证长时间运行的任务在意外挂掉后保证数据不丢失，checkpoint包含两种数据：metadata和data，本篇主要讨论对metadata的checkpoint。</font><br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/06/24/ Streaming+metadate+checkpoint/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -496,217 +638,14 @@
 
       
         
-          
-            <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>spark使用metrics的包路径为：org.apache.spark.metrics，核心类：MetricsSystem。可以把Spark Metrics的信息报告到各种各样的Sink，比如HTTP、JMX以及CSV文件。</p>
-<p>Spark的Metrics系统目前支持以下的实例：<br>        ○ master：Spark standalone模式的master进程；<br>        ○ worker：Spark standalone模式的worker进程；<br>        ○ executor：Spark executor；<br>        ○ driver：Spark driver进程；<br>        ○ applications：master进程里的一个组件，为各种应用作汇报。</p>
-<p>metrics结构主要分为sink和source，source指数据来源，Source内属性包含name和MetricRegistry，主要有：MasterSource、WorkerSource、ApplicationSource、StreamingSource、BlockManagerSource等。</p>
-<p><img src="/images/m_source.png" alt=""></p>
-<p>sink是将指标发送到哪，目前有：ConsoleSink、GangliaSink、GraphiteSink、MetricsServlet、JmxSink、CsvSink</p>
-<p><img src="/images/m_sink.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
-<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><p>在spark的conf目录下metrics.properties文件中配置，默认使用此文件，也可以通过-Dspark.metrics.conf=xxx指定。</p>
-<h2 id="sink配置参数说明"><a href="#sink配置参数说明" class="headerlink" title="sink配置参数说明"></a>sink配置参数说明</h2><h5 id="ConsoleSink-是记录Metrics信息到Console中"><a href="#ConsoleSink-是记录Metrics信息到Console中" class="headerlink" title="ConsoleSink 是记录Metrics信息到Console中"></a>ConsoleSink 是记录Metrics信息到Console中</h5><table>
-<thead>
-<tr>
-<th style="text-align:center">名称</th>
-<th style="text-align:center">默认值</th>
-<th style="text-align:center">描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">class</td>
-<td style="text-align:center">org.apache.spark.metrics.sink.ConsoleSink</td>
-<td style="text-align:center">Sink类</td>
-</tr>
-<tr>
-<td style="text-align:center">period</td>
-<td style="text-align:center">10</td>
-<td style="text-align:center">轮询间隔</td>
-</tr>
-<tr>
-<td style="text-align:center">unit</td>
-<td style="text-align:center">seconds</td>
-<td style="text-align:center">轮询间隔的单位</td>
-</tr>
-</tbody>
-</table>
-<h5 id="CSVSink-定期的把Metrics信息导出到CSV文件中"><a href="#CSVSink-定期的把Metrics信息导出到CSV文件中" class="headerlink" title="CSVSink  定期的把Metrics信息导出到CSV文件中"></a>CSVSink  定期的把Metrics信息导出到CSV文件中</h5><table>
-<thead>
-<tr>
-<th style="text-align:center">名称</th>
-<th style="text-align:center">默认值</th>
-<th style="text-align:center">描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">class</td>
-<td style="text-align:center">org.apache.spark.metrics.sink.CsvSink</td>
-<td style="text-align:center">Sink类</td>
-</tr>
-<tr>
-<td style="text-align:center">period</td>
-<td style="text-align:center">10</td>
-<td style="text-align:center">轮询间隔</td>
-</tr>
-<tr>
-<td style="text-align:center">unit</td>
-<td style="text-align:center">seconds</td>
-<td style="text-align:center">轮询间隔的单位</td>
-</tr>
-<tr>
-<td style="text-align:center">directory</td>
-<td style="text-align:center">/tmp</td>
-<td style="text-align:center">CSV文件存储的位置</td>
-</tr>
-</tbody>
-</table>
-<h5 id="JmxSink-可以通过JMX方式访问Mertics信息"><a href="#JmxSink-可以通过JMX方式访问Mertics信息" class="headerlink" title="JmxSink 可以通过JMX方式访问Mertics信息"></a>JmxSink 可以通过JMX方式访问Mertics信息</h5><table>
-<thead>
-<tr>
-<th style="text-align:center">名称</th>
-<th style="text-align:center">默认值</th>
-<th style="text-align:center">描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">class</td>
-<td style="text-align:center">org.apache.spark.metrics.sink.JmxSink</td>
-<td style="text-align:center">Sink类</td>
-</tr>
-</tbody>
-</table>
-<h5 id="MetricsServlet"><a href="#MetricsServlet" class="headerlink" title="MetricsServlet"></a>MetricsServlet</h5><table>
-<thead>
-<tr>
-<th style="text-align:center">名称</th>
-<th style="text-align:center">默认值</th>
-<th style="text-align:center">描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">class</td>
-<td style="text-align:center">org.apache.spark.metrics.sink.MetricsServlet</td>
-<td style="text-align:center">Sink类</td>
-</tr>
-<tr>
-<td style="text-align:center">path</td>
-<td style="text-align:center">VARIES*</td>
-<td style="text-align:center">Path prefix from the web server root</td>
-</tr>
-<tr>
-<td style="text-align:center">sample</td>
-<td style="text-align:center">false</td>
-<td style="text-align:center">Whether to show entire set of samples for histograms (‘false’ or ‘true’) ｜</td>
-</tr>
-</tbody>
-</table>
-<p>这个在Spark中默认就开启了，我们可以在4040端口页面的URL后面加上/metrics/json查看</p>
-<h5 id="GraphiteSink"><a href="#GraphiteSink" class="headerlink" title="GraphiteSink"></a>GraphiteSink</h5><table>
-<thead>
-<tr>
-<th style="text-align:center">名称</th>
-<th style="text-align:center">默认值</th>
-<th style="text-align:center">描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">class</td>
-<td style="text-align:center">org.apache.spark.metrics.sink.GraphiteSink</td>
-<td style="text-align:center">Sink类</td>
-</tr>
-<tr>
-<td style="text-align:center">host</td>
-<td style="text-align:center">NONE</td>
-<td style="text-align:center">Graphite服务器主机名</td>
-</tr>
-<tr>
-<td style="text-align:center">port</td>
-<td style="text-align:center">NONE</td>
-<td style="text-align:center">Graphite服务器端口</td>
-</tr>
-<tr>
-<td style="text-align:center">period</td>
-<td style="text-align:center">10</td>
-<td style="text-align:center">轮询间隔</td>
-</tr>
-<tr>
-<td style="text-align:center">unit</td>
-<td style="text-align:center">seconds</td>
-<td style="text-align:center">轮询间隔的单位</td>
-</tr>
-<tr>
-<td style="text-align:center">prefix</td>
-<td style="text-align:center">EMPTY STRING</td>
-<td style="text-align:center">Prefix to prepend to metric name</td>
-</tr>
-</tbody>
-</table>
-<h5 id="GangliaSink-由于Licene的限制，默认没有放到默认的build里面，如果需要使用，需要自己编译"><a href="#GangliaSink-由于Licene的限制，默认没有放到默认的build里面，如果需要使用，需要自己编译" class="headerlink" title="GangliaSink 由于Licene的限制，默认没有放到默认的build里面，如果需要使用，需要自己编译"></a>GangliaSink 由于Licene的限制，默认没有放到默认的build里面，如果需要使用，需要自己编译</h5><table>
-<thead>
-<tr>
-<th style="text-align:center">名称</th>
-<th style="text-align:center">默认值</th>
-<th style="text-align:center">描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">class</td>
-<td style="text-align:center">org.apache.spark.metrics.sink.GangliaSink</td>
-<td style="text-align:center">Sink类</td>
-</tr>
-<tr>
-<td style="text-align:center">host</td>
-<td style="text-align:center">NONE</td>
-<td style="text-align:center">Ganglia 服务器的主机名或multicast group</td>
-</tr>
-<tr>
-<td style="text-align:center">port</td>
-<td style="text-align:center">NONE</td>
-<td style="text-align:center">Ganglia服务器的端口</td>
-</tr>
-<tr>
-<td style="text-align:center">period</td>
-<td style="text-align:center">10</td>
-<td style="text-align:center">轮询间隔</td>
-</tr>
-<tr>
-<td style="text-align:center">unit</td>
-<td style="text-align:center">seconds</td>
-<td style="text-align:center">轮询间隔的单位</td>
-</tr>
-<tr>
-<td style="text-align:center">ttl</td>
-<td style="text-align:center">1</td>
-<td style="text-align:center">TTL of messages sent by Ganglia</td>
-</tr>
-<tr>
-<td style="text-align:center">mode</td>
-<td style="text-align:center">multicast</td>
-<td style="text-align:center">Ganglia网络模式(‘unicast’ or ‘multicast’)</td>
-</tr>
-</tbody>
-</table>
-<h2 id="sink配置样例"><a href="#sink配置样例" class="headerlink" title="sink配置样例"></a>sink配置样例</h2><p>语法 syntax: [instance].sink.[name].[options]=[value]</p>
-<pre><code>*.sink.console.class=org.apache.spark.metrics.sink.ConsoleSink
-*.sink.console.period=10
-*.sink.console.unit=seconds
-</code></pre><p>以上为所有实例开启ConsoleSink，包括master、worker、dirver、executor</p>
-<pre><code>master.sink.console.class=org.apache.spark.metrics.sink.ConsoleSink
-master.sink.console.period=10
-master.sink.console.unit=seconds
-</code></pre><p>以上只为master开启ConsoleSink</p>
-<h2 id="source配置样例"><a href="#source配置样例" class="headerlink" title="source配置样例"></a>source配置样例</h2><p>语法 syntax: [instance].source.[name].[options]=[value]</p>
-<p><code>master.source.jvm.class=org.apache.spark.metrics.source.JvmSource</code><br>以上为master开启JvmSource</p>
-<h1 id="代码流程"><a href="#代码流程" class="headerlink" title="代码流程"></a>代码流程</h1><p>1.各实例master、worker、dirver、executor在启动时创建MetricsSystem实例，在start时调用registerSources()、registerSinks()；<br>2.registerSources中在配置文件中找到对应实例的配置，获取Source的具体包名类名后，通过反射生成实例，再调用registerSource注册到registry中。各source中已定义好要记录的指标，可以继承Source采集自定义信息；<br>3.registerSinks中同样获取对应实例的配置，得到sink的包名类名反射生成实例，加到sinks列表中。<br>4.report方法中可调用所有sink的report方法（只在stop中调用）。</p>
-<p>参考：</p>
-<p><a href="http://hao.jobbole.com/metrics/" target="_blank" rel="noopener">http://hao.jobbole.com/metrics/</a><br><a href="https://www.jianshu.com/p/e4f70ddbc287" target="_blank" rel="noopener">https://www.jianshu.com/p/e4f70ddbc287</a><br><a href="https://www.iteblog.com/archives/1341.html" target="_blank" rel="noopener">https://www.iteblog.com/archives/1341.html</a></p>
-
-          
+          <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>spark使用metrics的包路径为：org.apache.spark.metrics，核心类：MetricsSystem。可以把Spark Metrics的信息报告到各种各样的Sink，比如HTTP、JMX以及CSV文件。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/06/22/Spark_metrics/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -846,14 +785,17 @@ master.sink.console.unit=seconds
       
         
           
-            <h2 id="Source源码调用"><a href="#Source源码调用" class="headerlink" title="Source源码调用"></a>Source源码调用</h2><p><img src="/images/s_source.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
-<p>Structured Streaming在Source阶段的调用过程如上图</p>
-<p>1.在start时会启动StreamExecution内部属性microBatchThread线程，在线程内部调用runBatches方法；<br>2.在方法内执行triggerExecutor.execute调用runBatch方法；<br>3.调用source的getBatch返回具体数据的DataFrame；<br>4.在各实现Source的类中，获取对应的流数据，以kafkaSource为例，在getBatch中传入start和end的offset参数，通过kafka metadata，获取各topic的parititon在当前时间要获取的offsetRanges，此工作在driver内执行，然后生成KafkaSourceRDD，传入kafka连接参数和offsetRanges等；<br>5.在RDD的compute方法内，首先调用getOrCreate方法获取CachedKafkaConsumer，并修正offsetRange，生成NextIterator迭代器；<br>6.在迭代器内调用CachedKafkaConsumer的get方法获取ConsumerRecord，在get内调用fetchData方法，此工作在各executor中执行，在 ConsumerRecord内保存着提前从kafka拉取出来的数据fetchedData，数据都是从其内部获取，当fetchedData为空时，调用kafkaConsumer的poll拉取数据填充；不为空拿到record并进行一系列fail的offset判断，正确后返回ConsumerRecord。</p>
-<h2 id="Sink源码调用"><a href="#Sink源码调用" class="headerlink" title="Sink源码调用"></a>Sink源码调用</h2><p><img src="/images/s_sink.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
-<p>Structured Streaming在Sink阶段的调用过程如上图</p>
-<p>1.前两步与Source阶段相同，在调用getBatch方法得到dataframe后，调用Sink的addBatch方法；<br>2.仍然以KafkaSink为例，在addBatch方法内调用KafkaWriter的write方法；<br>3.调用RDD的foreachPartition方法，得到iter后在各个executor中生成KafkaWriteTask执行execute方法；<br>4.通过CachedKafkaProducer.getOrCreate获取producer，在row中获取topic、key、value值，发送。</p>
-
-          
+          Source源码调用
+Structured Streaming在Source阶段的调用过程如上图
+1.在start时会启动StreamExecution内部属性microBatchThread线程，在线程内部调用runBatches方法；2.在方法内执行triggerExecutor.execute调用runBatch方法；3.调用source的getBatch返回具体数据的DataFrame；4.在各实现Source的类中，获取对应的流数据，以kafkaSource为例，在getBatch中传入start和end的offset参数，通过kafka metadata，获取各topic的pari
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/06/22/source_and_sink/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -992,22 +934,19 @@ master.sink.console.unit=seconds
 
       
         
-          
-            <h1 id="监控指标"><a href="#监控指标" class="headerlink" title="监控指标"></a>监控指标</h1><p>使用sparkMetricSink监控的指标</p>
+          <h1 id="监控指标"><a href="#监控指标" class="headerlink" title="监控指标"></a>监控指标</h1><p>使用sparkMetricSink监控的指标</p>
 <h1 id="考虑问题"><a href="#考虑问题" class="headerlink" title="考虑问题"></a>考虑问题</h1><ul>
 <li>spark自带的sink使用io.dropwizard.metrics，目前不支持prometheus</li>
 <li>spark自带的metrics名称格式为：appId.instance.[appName].XX，一旦应用重启，指标就会重置</li>
 <li>spark on yarn目前没有好的办法支持prometheus的动态发现</li>
 </ul>
-<h1 id="开发过程"><a href="#开发过程" class="headerlink" title="开发过程"></a>开发过程</h1><h2 id="1-开发PrometheusMetricsServlet"><a href="#1-开发PrometheusMetricsServlet" class="headerlink" title="1. 开发PrometheusMetricsServlet"></a>1. 开发PrometheusMetricsServlet</h2><p>(1).此类继承spark目前已有的MetricsServlet，MetricsServlet为spark默认开启的sink通过/metrics/json可访问json格式的metrics；并且spark只能开启一个servletsink，所以必须配置中必须指定：*.sink.servlet.class=org.apache.spark.metrics.sink.PrometheusMetricsServlet</p>
-<p>(2). 引入prometheus dropwizard client<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;io.prometheus&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;simpleclient_dropwizard&lt;/artifactId&gt;</span><br><span class="line"> &lt;/dependency&gt;</span><br></pre></td></tr></table></figure></p>
-<p>(3). 在getMetricsSnapshot方法内，将MetricRegistry转换成prometheus的结构，在转换中去掉metrics中key里面的appid，write004方法仿照TextFormat改造；<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">override def getMetricsSnapshot(request: HttpServletRequest): String = &#123;</span><br><span class="line">  val stringWriter = new StringWriter();</span><br><span class="line">  PrometheusMetrics.write004(stringWriter,collectorRegistry.metricFamilySamples())</span><br><span class="line">  stringWriter.close()</span><br><span class="line">  stringWriter.getBuffer.toString</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>(4). 以上修改完成后，启动应用访问yarn_url/proxy/application_XXX_X/metrics/json页面，即可以看到prometheus结构数据</p>
-<h2 id="2-读取yarn信息生成json文件"><a href="#2-读取yarn信息生成json文件" class="headerlink" title="2. 读取yarn信息生成json文件"></a>2. 读取yarn信息生成json文件</h2><p>使用python从yarn读取spark的地址信息，并加上appName标签，按照队列名称生成文件，代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"># coding:utf-8</span><br><span class="line">import json</span><br><span class="line">from httplib import HTTPConnection</span><br><span class="line"></span><br><span class="line">urls = [&quot;rm1.com&quot;, &quot;rm2.com&quot;]</span><br><span class="line">queues = [&quot;queue&quot;]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 解析json获取applications信息</span><br><span class="line">def applications_info(path, method=&quot;GET&quot;):</span><br><span class="line">    for url in urls:</span><br><span class="line">        try:</span><br><span class="line">            conn = HTTPConnection(host=url, port=8088, timeout=3)</span><br><span class="line">            conn.request(method, path)</span><br><span class="line">            response = conn.getresponse()</span><br><span class="line">            jsonobj = json.loads(response.read())</span><br><span class="line">            conn.close()</span><br><span class="line">            if jsonobj:</span><br><span class="line">                return jsonobj[&quot;apps&quot;][&quot;app&quot;]</span><br><span class="line">        except Exception, e:</span><br><span class="line">            # print e</span><br><span class="line">            pass</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    for queue in queues:</span><br><span class="line">        apps = applications_info(</span><br><span class="line">            &quot;/ws/v1/cluster/apps?states=RUNNING&amp;type=spark&amp;queue=&#123;0&#125;&quot;.format(queue))</span><br><span class="line">        result_list = []</span><br><span class="line">        if apps:</span><br><span class="line">            for app in apps:</span><br><span class="line">                appid = app[&quot;id&quot;]</span><br><span class="line">                appname = app[&quot;name&quot;].replace(&quot;-&quot;, &quot;_&quot;)</span><br><span class="line">                trackingUrl = app[&quot;trackingUrl&quot;][7:]</span><br><span class="line">                index = trackingUrl.find(&quot;/&quot;)</span><br><span class="line">                result_list.append(&#123;&quot;targets&quot;: [trackingUrl[0:index]],</span><br><span class="line">                                    &quot;labels&quot;: &#123;&quot;appName&quot;: appname,</span><br><span class="line">                                               &quot;__metrics_path__&quot;: &quot;&#123;0&#125;metrics/json&quot;.format(trackingUrl[index:])&#125;</span><br><span class="line">                                    &#125;)</span><br><span class="line">        print(result_list)</span><br><span class="line">        fo = open(&quot;spark/&#123;0&#125;.json&quot;.format(queue), &quot;w&quot;)</span><br><span class="line">        fo.write(json.dumps(result_list, indent=4))</span><br><span class="line">        fo.close()</span><br></pre></td></tr></table></figure></p>
-<p>生成的json格式如下，因为prometheus的target只能包含ip和port，通过”__metrics_path__” 指定具体访问路径：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        &quot;labels&quot;: &#123;</span><br><span class="line">            &quot;__metrics_path__&quot;:&quot;/proxy/application_XXX_X/metrics/json&quot;,</span><br><span class="line">            &quot;appName&quot;:&quot;app_name&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;targets&quot;: [</span><br><span class="line">            &quot;yarn_url:8088&quot;</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="3-配置prometheus动态文件"><a href="#3-配置prometheus动态文件" class="headerlink" title="3. 配置prometheus动态文件"></a>3. 配置prometheus动态文件</h2><p>prometheus支持多种动态发现配置，此处使用file_sd_configs文件动态发现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">file_sd_configs:</span><br><span class="line">      - files: [&apos;spark/*.json&apos;]</span><br></pre></td></tr></table></figure></p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/06/22/prometheus+spark/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1147,39 +1086,18 @@ master.sink.console.unit=seconds
       
         
           
-            <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在博客网站发布markdown格式的博客越来越方便，但发现好多个人博客的样式大都一样，研究发现好多都是使用github+hexo+个人域名，貌似并不复杂，所以尝试搞起。使用Mac + Docker + Hexo + github，由于不想在自己电脑安装过多的东西，所以docker是最好的选择。</p>
-<h1 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h1><h2 id="打包hexo镜像"><a href="#打包hexo镜像" class="headerlink" title="打包hexo镜像"></a>打包hexo镜像</h2><p>在docker官方hub上找了几个hexo的镜像，发现stars和pull的都不太多，在github上查了一下，对几个做了整合，地址分别为<a href="https://github.com/yakumioto/docker-hexo" target="_blank" rel="noopener">docker-hexo</a> 和<a href="https://github.com/neoFelhz/hexo-docker" target="_blank" rel="noopener">hexo-docker</a>。</p>
-<p>最后镜像的Dockerfile如下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">FROM node:9.5-alpine</span><br><span class="line"></span><br><span class="line">RUN apk add --update --no-cache git</span><br><span class="line">RUN npm config set unsafe-perm true </span><br><span class="line">	&amp;&amp; npm install hexo-cli -g</span><br><span class="line"></span><br><span class="line">WORKDIR /Hexo</span><br><span class="line"></span><br><span class="line">EXPOSE 4000</span><br></pre></td></tr></table></figure>
-<p>分别使用过ubuntu和centos做过测试，在启动过程中都出现若干问题，有的是在安装nodejs有的是在执行npm，总之对以上问题没有深入解决使用了最后的方案。</p>
-<p>打包镜像完成后，首先初始化，命令如下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker run -it \</span><br><span class="line">	-v /hexo:/Hexo \</span><br><span class="line">	li1231/hexo \</span><br><span class="line">	sh -c &apos;hexo init . &amp;&amp; npm install &amp;&amp; npm install hexo-deployer-git --save&apos;</span><br></pre></td></tr></table></figure>
-<p>将初始化的所有结果都保存到外挂目录内，命令执行完后会在hexo初始化目录结构如下</p>
-<pre><code>_config.yml    
-db.json
-node_modules
-package-lock.json
-package.json
-public
-scaffolds
-source
-themes
-</code></pre><p>到此hexo安装成功。</p>
-<h2 id="本地测试"><a href="#本地测试" class="headerlink" title="本地测试"></a>本地测试</h2><p>在source/_posts目录下创建md的文件，也可以使用hexo n创建md文件，使用hexo g命令生成静态页面，使用hexo s生成预览，通过本地访问页面查看效果。因为使用hexo的详细说明特别多，在此不多说。先执行生成命令如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker run -it \</span><br><span class="line">	-v /hexo:/Hexo \</span><br><span class="line">	li1231/hexo \</span><br><span class="line">	hexo g</span><br></pre></td></tr></table></figure>
-<p>再执行预览命令：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker run -it \</span><br><span class="line">	-p 4000:4000 \</span><br><span class="line">	-v /hexo:/Hexo \</span><br><span class="line">	li1231/hexo \</span><br><span class="line">	hexo s</span><br></pre></td></tr></table></figure>
-<p>开启本机4000端口访问。</p>
-<h2 id="github创建repository"><a href="#github创建repository" class="headerlink" title="github创建repository"></a>github创建repository</h2><p>在github自己账号创建 username.github.io的repository，如果有自己域名可以绑定，此教程网上特别详细，此处省略。</p>
-<h2 id="提交本地博客到github"><a href="#提交本地博客到github" class="headerlink" title="提交本地博客到github"></a>提交本地博客到github</h2><p>将本地的静态页面提交到github，要先修改主配置_config.yml，增加</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  type: git</span><br><span class="line">  repo: https://github.com/username/username.github.io.git</span><br><span class="line">  branch: master</span><br></pre></td></tr></table></figure>
-<p>再执行hexo deploy命令提交</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker run -it \</span><br><span class="line">	-v /hexo:/Hexo \</span><br><span class="line">	li1231/hexo \</span><br><span class="line">	hexo d</span><br></pre></td></tr></table></figure>
-<p>在提交过程中要输入用户名和密码。本以为将本机公钥加到github中，再将.ssh文件夹挂载到docker同时git config –global user.name &amp;&amp; git config –global user.email可以直接免密，但目前还没有成功。</p>
-<p>参考：</p>
-<p><a href="https://www.cnblogs.com/visugar/p/6821777.html" target="_blank" rel="noopener">https://www.cnblogs.com/visugar/p/6821777.html</a></p>
-
-          
+          背景在博客网站发布markdown格式的博客越来越方便，但发现好多个人博客的样式大都一样，研究发现好多都是使用github+hexo+个人域名，貌似并不复杂，所以尝试搞起。使用Mac + Docker + Hexo + github，由于不想在自己电脑安装过多的东西，所以docker是最好的选择。
+过程打包hexo镜像在docker官方hub上找了几个hexo的镜像，发现stars和pull的都不太多，在github上查了一下，对几个做了整合，地址分别为docker-hexo 和hexo-docker。
+最后镜像的Dockerfile如下
+123456789FROM node:9.5-alpi
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/06/21/hexo+docker+github/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1259,7 +1177,7 @@ themes
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
