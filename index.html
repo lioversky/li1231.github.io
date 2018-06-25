@@ -784,11 +784,8 @@
 
       
         
-          
-          Source源码调用
-Structured Streaming在Source阶段的调用过程如上图
-1.在start时会启动StreamExecution内部属性microBatchThread线程，在线程内部调用runBatches方法；2.在方法内执行triggerExecutor.execute调用runBatch方法；3.调用source的getBatch返回具体数据的DataFrame；4.在各实现Source的类中，获取对应的流数据，以kafkaSource为例，在getBatch中传入start和end的offset参数，通过kafka metadata，获取各topic的pari
-          ...
+          <h2 id="Source源码调用"><a href="#Source源码调用" class="headerlink" title="Source源码调用"></a>Source源码调用</h2><p><img src="/images/s_source.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>Structured Streaming在Source阶段的调用过程如上图<br>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2018/06/22/source_and_sink/#more" rel="contents">
@@ -1085,12 +1082,7 @@ Structured Streaming在Source阶段的调用过程如上图
 
       
         
-          
-          背景在博客网站发布markdown格式的博客越来越方便，但发现好多个人博客的样式大都一样，研究发现好多都是使用github+hexo+个人域名，貌似并不复杂，所以尝试搞起。使用Mac + Docker + Hexo + github，由于不想在自己电脑安装过多的东西，所以docker是最好的选择。
-过程打包hexo镜像在docker官方hub上找了几个hexo的镜像，发现stars和pull的都不太多，在github上查了一下，对几个做了整合，地址分别为docker-hexo 和hexo-docker。
-最后镜像的Dockerfile如下
-123456789FROM node:9.5-alpi
-          ...
+          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在博客网站发布markdown格式的博客越来越方便，但发现好多个人博客的样式大都一样，研究发现好多都是使用github+hexo+个人域名，貌似并不复杂，所以尝试搞起。使用Mac + Docker + Hexo + github，由于不想在自己电脑安装过多的东西，所以docker是最好的选择。<br>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2018/06/21/hexo+docker+github/#more" rel="contents">

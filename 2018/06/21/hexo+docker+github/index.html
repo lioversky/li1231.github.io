@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="背景在博客网站发布markdown格式的博客越来越方便，但发现好多个人博客的样式大都一样，研究发现好多都是使用github+hexo+个人域名，貌似并不复杂，所以尝试搞起。使用Mac + Docker + Hexo + github，由于不想在自己电脑安装过多的东西，所以docker是最好的选择。 过程打包hexo镜像在docker官方hub上找了几个hexo的镜像，发现stars和pull的都不">
+<meta name="description" content="背景在博客网站发布markdown格式的博客越来越方便，但发现好多个人博客的样式大都一样，研究发现好多都是使用github+hexo+个人域名，貌似并不复杂，所以尝试搞起。使用Mac + Docker + Hexo + github，由于不想在自己电脑安装过多的东西，所以docker是最好的选择。">
 <meta name="keywords" content="hexo">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Docker部署hexo在github搭建博客">
 <meta property="og:url" content="http://li1231.com/2018/06/21/hexo+docker+github/index.html">
 <meta property="og:site_name" content="li1231">
-<meta property="og:description" content="背景在博客网站发布markdown格式的博客越来越方便，但发现好多个人博客的样式大都一样，研究发现好多都是使用github+hexo+个人域名，貌似并不复杂，所以尝试搞起。使用Mac + Docker + Hexo + github，由于不想在自己电脑安装过多的东西，所以docker是最好的选择。 过程打包hexo镜像在docker官方hub上找了几个hexo的镜像，发现stars和pull的都不">
+<meta property="og:description" content="背景在博客网站发布markdown格式的博客越来越方便，但发现好多个人博客的样式大都一样，研究发现好多都是使用github+hexo+个人域名，貌似并不复杂，所以尝试搞起。使用Mac + Docker + Hexo + github，由于不想在自己电脑安装过多的东西，所以docker是最好的选择。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-06-24T14:35:43.000Z">
+<meta property="og:updated_time" content="2018-06-25T08:14:36.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Docker部署hexo在github搭建博客">
-<meta name="twitter:description" content="背景在博客网站发布markdown格式的博客越来越方便，但发现好多个人博客的样式大都一样，研究发现好多都是使用github+hexo+个人域名，貌似并不复杂，所以尝试搞起。使用Mac + Docker + Hexo + github，由于不想在自己电脑安装过多的东西，所以docker是最好的选择。 过程打包hexo镜像在docker官方hub上找了几个hexo的镜像，发现stars和pull的都不">
+<meta name="twitter:description" content="背景在博客网站发布markdown格式的博客越来越方便，但发现好多个人博客的样式大都一样，研究发现好多都是使用github+hexo+个人域名，貌似并不复杂，所以尝试搞起。使用Mac + Docker + Hexo + github，由于不想在自己电脑安装过多的东西，所以docker是最好的选择。">
 
 
 
@@ -342,7 +342,7 @@
       
 
       
-        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在博客网站发布markdown格式的博客越来越方便，但发现好多个人博客的样式大都一样，研究发现好多都是使用github+hexo+个人域名，貌似并不复杂，所以尝试搞起。使用Mac + Docker + Hexo + github，由于不想在自己电脑安装过多的东西，所以docker是最好的选择。</p>
+        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在博客网站发布markdown格式的博客越来越方便，但发现好多个人博客的样式大都一样，研究发现好多都是使用github+hexo+个人域名，貌似并不复杂，所以尝试搞起。使用Mac + Docker + Hexo + github，由于不想在自己电脑安装过多的东西，所以docker是最好的选择。<br><a id="more"></a></p>
 <h1 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h1><h2 id="打包hexo镜像"><a href="#打包hexo镜像" class="headerlink" title="打包hexo镜像"></a>打包hexo镜像</h2><p>在docker官方hub上找了几个hexo的镜像，发现stars和pull的都不太多，在github上查了一下，对几个做了整合，地址分别为<a href="https://github.com/yakumioto/docker-hexo" target="_blank" rel="noopener">docker-hexo</a> 和<a href="https://github.com/neoFelhz/hexo-docker" target="_blank" rel="noopener">hexo-docker</a>。</p>
 <p>最后镜像的Dockerfile如下</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">FROM node:9.5-alpine</span><br><span class="line"></span><br><span class="line">RUN apk add --update --no-cache git</span><br><span class="line">RUN npm config set unsafe-perm true </span><br><span class="line">	&amp;&amp; npm install hexo-cli -g</span><br><span class="line"></span><br><span class="line">WORKDIR /Hexo</span><br><span class="line"></span><br><span class="line">EXPOSE 4000</span><br></pre></td></tr></table></figure>
