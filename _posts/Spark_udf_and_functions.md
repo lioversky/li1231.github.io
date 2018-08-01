@@ -1,6 +1,6 @@
 ---
 title: Spark UDF and functions
-date: 2018-06-22 08:35:32
+date: 2018-07-25 15:00:00
 tags: spark
 categories: 技术
 ---
@@ -21,7 +21,7 @@ categories: 技术
 	    }, DataTypes.createArrayType(DataTypes.StringType));
 	    //sparkSession.udf().register("split", (String value) -> value.split(","),DataTypes.createArrayType(DataTypes.StringType));
 		```
-		
+<!-- more -->		
 	- scala:
 		
 		```
