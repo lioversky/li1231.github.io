@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="spark," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="描述针对kafka0.8.2的API，Spark Streaming有两个版本的Source，Receiver和DirectAPI，其中Receiver模式使用HighLevel对应为KafkaInputDStream，继承自ReceiverInputDStream再继承InputDStream，DirectAPI使用SimpleConsumer对应DirectKafkaInputDStream直">
+<meta name="keywords" content="spark">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spark Streaming Source Kafka 0.8.2">
+<meta property="og:url" content="http://li1231.com/2018/07/31/Spark_Streaming_Source_Kafka_0_8_2/index.html">
+<meta property="og:site_name" content="li1231">
+<meta property="og:description" content="描述针对kafka0.8.2的API，Spark Streaming有两个版本的Source，Receiver和DirectAPI，其中Receiver模式使用HighLevel对应为KafkaInputDStream，继承自ReceiverInputDStream再继承InputDStream，DirectAPI使用SimpleConsumer对应DirectKafkaInputDStream直">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-08-01T03:10:39.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spark Streaming Source Kafka 0.8.2">
+<meta name="twitter:description" content="描述针对kafka0.8.2的API，Spark Streaming有两个版本的Source，Receiver和DirectAPI，其中Receiver模式使用HighLevel对应为KafkaInputDStream，继承自ReceiverInputDStream再继承InputDStream，DirectAPI使用SimpleConsumer对应DirectKafkaInputDStream直">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://li1231.com/2018/07/31/Spark_Streaming_Source_Kafka_0_8_2/"/>
+
+
+
+
+
+  <title>Spark Streaming Source Kafka 0.8.2 | li1231</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">li1231</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://li1231.com/2018/07/31/Spark_Streaming_Source_Kafka_0_8_2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="li1231">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="li1231">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Spark Streaming Source Kafka 0.8.2</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-31T10:00:00+08:00">
+                2018-07-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="描述"><a href="#描述" class="headerlink" title="描述"></a>描述</h1><p>针对kafka0.8.2的API，Spark Streaming有两个版本的Source，Receiver和DirectAPI，其中Receiver模式使用HighLevel对应为KafkaInputDStream，继承自ReceiverInputDStream再继承InputDStream，DirectAPI使用SimpleConsumer对应DirectKafkaInputDStream直接继承自InputDStream。此二者的具体差别网上有更详细的描述，在此简单介绍一下：<br><a id="more"></a></p>
+<ul>
+<li>Receiver是预拉取数据，即先把数据读取到各executor的内存中，由BolckManager分配管理；而DirectAPI在每个batch中只是生成对应metadata，记录要处理的fromOffset和untilOffset，在实际执行任务时才拉取数据；</li>
+<li>Receiver生成的task数与生成block数相关，block数与spark.streaming.blockInterval有关；而DirectAPI的task数与kafka partition数一一对应；</li>
+</ul>
+<p>正由于以上差别，在不同情景两种方式各有优劣，简单概括如下：</p>
+<h3 id="Receiver优势"><a href="#Receiver优势" class="headerlink" title="Receiver优势"></a>Receiver优势</h3><ol>
+<li>由于两种方式kafka底层实现的不同，Receiver不需要自己管理offset而DirectAPI需要自己管理；</li>
+<li>当消费的topic过多或者topic对应的partition过多时，DirectAPI会产生特别多的task，这会使spark对调度产生更大的开销；而Receiver可以通过spark参数控制；</li>
+<li>DirectAPI在生成Batch时，会首先查询topic的metadata数据，再根据topicAndPartition获取当前endOffset来决定Batch的起止offset，如果kafka的partition异常如topic对应的partition无leader，会无法生成新batch导致spark程序失败或者连接非partitionLeader，而Receiver不会出现此种错误；</li>
+</ol>
+<h3 id="DirectAPI优势"><a href="#DirectAPI优势" class="headerlink" title="DirectAPI优势"></a>DirectAPI优势</h3><ol>
+<li>由于Receiver是预拉取，并且可以控制在处理完成batch后更新consumer的offset，所以在有数据堆积时程序异常终止会丢失数据，而DirectAPI不会丢失数据，可能会有数据重复消费情况；</li>
+<li>spark在2.0以前，在每个batch结束之后会调用cleanMetadata方法，此方法会清除当前batch及之前的所有数据，包括metadta和block，所以在开启并行（spark.streaming.concurrentJobs&gt;1）如果后面的batch先执行完，会出现 block not found的异常，大部分都是由于此问题导致；</li>
+<li>Receiver模式在kafka不太稳定情况下，日志经常会出现reblance，并且有数据重复消费情况；</li>
+</ol>
+<h1 id="实现原理与使用"><a href="#实现原理与使用" class="headerlink" title="实现原理与使用"></a>实现原理与使用</h1><h2 id="Receiver模式"><a href="#Receiver模式" class="headerlink" title="Receiver模式"></a>Receiver模式</h2><p>Receiver模式实现类为KafkaInputDStream，继承自ReceiverInputDStream，实现其getReceiver方法。KafkaReceiver在onStart方法中创建指定线程数读取数据，再通过Receiver的store方法写到blockManager中；</p>
+<ol>
+<li><p>下面代码是创建KafkaInputDStream并生成numStreams个Receiver：</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">List&lt;JavaPairDStream&lt;String, String&gt;&gt; kafkaStreams = <span class="keyword">new</span> ArrayList&lt;JavaPairDStream&lt;String, String&gt;&gt;(numStreams);</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; numStreams; i++) &#123;</span><br><span class="line">  kafkaStreams.add(KafkaUtils.createStream(streamingContext,zookeeper, groupId, topicMap,storageLevel));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>下面代码负责为每个进程创建线程（源码）：</p>
+ <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> topicMessageStreams = consumerConnector.createMessageStreams(</span><br><span class="line">      topics, keyDecoder, valueDecoder)</span><br><span class="line"><span class="keyword">val</span> executorPool =</span><br><span class="line">      <span class="type">ThreadUtils</span>.newDaemonFixedThreadPool(topics.values.sum, <span class="string">"KafkaMessageHandler"</span>)</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">  <span class="comment">// Start the messages handler for each partition</span></span><br><span class="line">  topicMessageStreams.values.foreach &#123; streams =&gt;</span><br><span class="line">    streams.foreach &#123; stream =&gt; executorPool.submit(<span class="keyword">new</span> <span class="type">MessageHandler</span>(stream)) &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">  executorPool.shutdown() <span class="comment">// Just causes threads to terminate after work is done</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>下面代码在MessageHandler负责读取处理消息数据（源码）：</p>
+ <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> streamIterator = stream.iterator()</span><br><span class="line"><span class="keyword">while</span> (streamIterator.hasNext()) &#123;</span><br><span class="line">  <span class="keyword">val</span> msgAndMetadata = streamIterator.next()</span><br><span class="line">  store((msgAndMetadata.key, msgAndMetadata.message))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ReceiverInputDStream的compute创建BlockRDD（源码）：</p>
+ <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//ask the tracker for all the blocks that have been allocated to this stream</span></span><br><span class="line"><span class="comment">// for this batch</span></span><br><span class="line"><span class="keyword">val</span> blockInfos = receiverTracker.getBlocksOfBatch(validTime).getOrElse(id, <span class="type">Seq</span>.empty)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create the BlockRDD</span></span><br><span class="line">createBlockRDD(validTime, blockInfos)</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="DirectAPI模式"><a href="#DirectAPI模式" class="headerlink" title="DirectAPI模式"></a>DirectAPI模式</h2><p>direct模式需要自己保存offset，可以通过checkpoint保存或者外部存储。使用<code>KafkaUtils.createDirectStream</code>创建InputDStream，此方法有多个重载，根据需要使用。</p>
+<ol>
+<li><p>在每次启动时都要传入partitionOffset，offset从保存位置读取，创建stream代码如下：</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;TopicAndPartition, java.lang.Long&gt; offsets = ....</span><br><span class="line">Class&lt;Tuple2&lt;String, String&gt;&gt; c = (Class&lt;Tuple2&lt;String, String&gt;&gt;) (Class) Tuple2.class;</span><br><span class="line">JavaInputDStream&lt;Tuple2&lt;String, String&gt;&gt; messages = KafkaUtils</span><br><span class="line">       .createDirectStream(streamingContext, String.class,</span><br><span class="line">           String.class, StringDecoder.class, StringDecoder.class, c, kafkaParams, offsets,</span><br><span class="line">           <span class="keyword">new</span> Function&lt;MessageAndMetadata&lt;String, String&gt;, Tuple2&lt;String, String&gt;&gt;() &#123;</span><br><span class="line">             <span class="function"><span class="keyword">public</span> Tuple2&lt;String, String&gt; <span class="title">call</span><span class="params">(MessageAndMetadata&lt;String, String&gt; md)</span></span></span><br><span class="line"><span class="function">                 <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">               <span class="keyword">return</span> <span class="keyword">new</span> Tuple2&lt;String, String&gt;(md.key(), md.message());</span><br><span class="line">             &#125;</span><br><span class="line">           &#125;</span><br><span class="line">       );</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在生成每个batch任务时，DirectKafkaInputDStream内保存当前已记录的offsets值，再通过获取latestLeaderOffsets，计算出本本次batch要处理的数据区间，此区间会被每个分区的配置最大消费数限制；</p>
+ <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> untilOffsets = clamp(latestLeaderOffsets(maxRetries))</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>正是由于每个batch都要获取当前各paritition最大的offset值，<code>kc.getLatestLeaderOffsets(currentOffsets.keySet)</code>，所以在kafka的partition出现异常时会导致任务出错或者由于连接超时阻塞任务生成；</p>
+</li>
+<li><p>得到currentOffsets和untilOffsets后，创建KafkaRDD，rdd内部属性offsetRanges记录此rdd要处理的各partition的offset区间值，通过此属性生成对应数量的KafkaRDDPartition。</p>
+ <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> rdd = <span class="type">KafkaRDD</span>[<span class="type">K</span>, <span class="type">V</span>, <span class="type">U</span>, <span class="type">T</span>, <span class="type">R</span>](</span><br><span class="line">     context.sparkContext, kafkaParams, currentOffsets, untilOffsets, messageHandler)</span><br></pre></td></tr></table></figure>
+ <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> offsetRanges = fromOffsets.map &#123; <span class="keyword">case</span> (tp, fo) =&gt;</span><br><span class="line">       <span class="keyword">val</span> uo = untilOffsets(tp)</span><br><span class="line">       <span class="type">OffsetRange</span>(tp.topic, tp.partition, fo, uo.offset)</span><br><span class="line">   &#125;.toArray</span><br></pre></td></tr></table></figure>
+ <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">getPartitions</span></span>: <span class="type">Array</span>[<span class="type">Partition</span>] = &#123;</span><br><span class="line">    offsetRanges.zipWithIndex.map &#123; <span class="keyword">case</span> (o, i) =&gt;</span><br><span class="line">        <span class="keyword">val</span> (host, port) = leaders(<span class="type">TopicAndPartition</span>(o.topic, o.partition))</span><br><span class="line">        <span class="keyword">new</span> <span class="type">KafkaRDDPartition</span>(i, o.topic, o.partition, o.fromOffset, o.untilOffset, host, port)</span><br><span class="line">    &#125;.toArray</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在执行每个batch job时，为每个partition生成KafkaRDDIterator实例，根据每个partition中的信息创建SimpleConsumer连接，并认为此节点为对应kafka Partition的Leader，如果在此之前切换Leader也会出现kafka异常。在KafkaRDDIterator中通过getNext方法即时获取数据。</p>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/spark/" rel="tag"># spark</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/25/hexo_nexT_config/" rel="next" title="hexo使用nexT主题修改参数整理">
+                <i class="fa fa-chevron-left"></i> hexo使用nexT主题修改参数整理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">li1231</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/lioversky" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://weibo.com/lioversky" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>微博</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#描述"><span class="nav-number">1.</span> <span class="nav-text">描述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Receiver优势"><span class="nav-number">1.0.1.</span> <span class="nav-text">Receiver优势</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DirectAPI优势"><span class="nav-number">1.0.2.</span> <span class="nav-text">DirectAPI优势</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实现原理与使用"><span class="nav-number">2.</span> <span class="nav-text">实现原理与使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Receiver模式"><span class="nav-number">2.1.</span> <span class="nav-text">Receiver模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DirectAPI模式"><span class="nav-number">2.2.</span> <span class="nav-text">DirectAPI模式</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">li1231</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
