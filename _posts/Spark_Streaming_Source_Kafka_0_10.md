@@ -9,7 +9,7 @@ categories: 技术
 
 Kafka从0.9版本后，取消了simple level和High level的api，统一了Consumer，所以spark streaming也只保留了Direct模式。Kafka的具体变化见kafka官方文档，本文只描述spark streaming集成kafka0.10版本，代码样例见[spark kafka样例](http://spark.apache.org/docs/latest/streaming-kafka-0-10-integration.html)。本文档描述与实际可能有偏差，请注意甄别。
 
-
+<!-- more -->
 ## 任务生成
 
 通过KafkaUtils生成的是DirectKafkaInputDStream，在driver端会使用ConsumerStrategy创建KafkaConsumer实例，代码如下：
@@ -40,6 +40,7 @@ override def start(): Unit = {
     c.pause(currentOffsets.keySet.asJava)
   }
 ```  
+
 由于目前对kafka client研究不是太透彻，猜测要想获取当前offset调用consumer的assignment方法时，如果不先pull一下，获取结果为空，但又怕pull时真取出来数据更新了offset位置导致丢失数据，所以paranoidPoll方法就是为了做修正的。
 
 在生成batch时会调用DStream的compute方法，在DirectKafkaInputDStream的compute中，首先计算当前batch的各partition的起始位置，就是先获取各partition的当前最大offset，与当前处理的offset的差和每个限流的partition读取最大数据取最小。获取当前最大offset代码如下：
@@ -62,11 +63,41 @@ override def start(): Unit = {
   }
 ```
 
-kafka consumer cliet 提供了一系列seek方法，seek(),seekToBeginning(),seekToEnd()，分别是跳到指定位置、最小和最大。上面代码是将当前consumer的offset跳到最大然后获取当前c.position，经测试此方法会将当前groupId在kafka保存的offset同时更新到最大，如果猜测正确，会像kafka 0.8版本那样，一旦有任务堆积程序异常终止后，由于有未完成的batch导致数据丢失情况。
+kafka consumer cliet 提供了一系列seek方法，seek(),seekToBeginning(),seekToEnd()，分别是跳到指定位置、最小和最大。上面代码是将当前consumer的offset跳到最大然后获取最大c.position，经测试此方法会将当前groupId在kafka保存的offset同时更新到最大，如果猜测正确，会像kafka 0.8版本那样，一旦有任务堆积程序异常终止后，由于有未完成的batch导致数据丢失情况。
 
 ## 任务计算
 
 在Dstream生成KafkaRDD，执行任务时调用compute方法，spark把kafka consumer封装使用CachedKafkaConsumer，在获取数据时只需调用 `val r = consumer.get(requestOffset, pollTimeout)`，CachedKafkaConsumer只在executor中创建，使用`cache: ju.LinkedHashMap[CacheKey, CachedKafkaConsumer[_, _]]`缓存consumer实例，key的结构为`case class CacheKey(groupId: String, topic: String, partition: Int)`。
+
+在CachedKafkaConsumer创建KafkaConsumer时参数与driver有所不同，使用`KafkaUtils.fixKafkaParams`做了修改，代码如下：
+
+```scala
+  private[kafka010] def fixKafkaParams(kafkaParams: ju.HashMap[String, Object]): Unit = {
+    logWarning(s"overriding ${ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG} to false for executor")
+    kafkaParams.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false: java.lang.Boolean)
+
+    logWarning(s"overriding ${ConsumerConfig.AUTO_OFFSET_RESET_CONFIG} to none for executor")
+    kafkaParams.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "none")
+
+    // driver and executor should be in different consumer groups
+    val originalGroupId = kafkaParams.get(ConsumerConfig.GROUP_ID_CONFIG)
+    if (null == originalGroupId) {
+      logError(s"${ConsumerConfig.GROUP_ID_CONFIG} is null, you should probably set it")
+    }
+    val groupId = "spark-executor-" + originalGroupId
+    logWarning(s"overriding executor ${ConsumerConfig.GROUP_ID_CONFIG} to ${groupId}")
+    kafkaParams.put(ConsumerConfig.GROUP_ID_CONFIG, groupId)
+
+    // possible workaround for KAFKA-3135
+    val rbb = kafkaParams.get(ConsumerConfig.RECEIVE_BUFFER_CONFIG)
+    if (null == rbb || rbb.asInstanceOf[java.lang.Integer] < 65536) {
+      logWarning(s"overriding ${ConsumerConfig.RECEIVE_BUFFER_CONFIG} to 65536 see KAFKA-3135")
+      kafkaParams.put(ConsumerConfig.RECEIVE_BUFFER_CONFIG, 65536: java.lang.Integer)
+    }
+  }
+```
+
+最主要的修改即driver与实际executor拉取数据使用不同的groupId，但在executor数据并不会真正提交offset，offset还是由driver控制。
 
 是否使用Cache Consumer由参数"spark.streaming.kafka.consumer.cache.enabled"控制，默认为true使用。在get方法时传入当前要获取的offset，get方法代码如下：
 

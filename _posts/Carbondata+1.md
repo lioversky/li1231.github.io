@@ -1,4 +1,9 @@
-# Carbondata整理 一
+---
+title: Carbondata整理 一
+date: 2018-11-6 20:30:00
+tags: Carbondata
+categories: 技术
+---
 
 今天试运行了一下离线spark数据写入Carbondata，Carbondata使用1.5.0并自行编译的jar包，spark使用2.3.2。maven中央库的提供Carbondata的jar包spark好像是2.2.X版本，另外Carbondata-1.5.0好像对spark2.3只支持spark2.3.2，2.3.1api有不兼容的地方（也可能是我没用对）。
 
@@ -69,32 +74,17 @@
 ```xml
 <configuration>
 
-  <!--<property>
-    <name>javax.jdo.option.ConnectionURL</name>
-    <value>jdbc:derby:memory:databaseName=metastore_db;create=true</value>
-  </property>
-
-  <property>
-    <name>javax.jdo.option.ConnectionDriverName</name>
-    <value>org.apache.derby.jdbc.EmbeddedDriver</value>
-  </property>
-
   <property>
     <name>hive.metastore.warehouse.dir</name>
-    <value>file://${user.dir}/hive/warehouse</value>
-  </property>-->
-
-  <property>
-    <name>hive.metastore.warehouse.dir</name>
-    <value>hdfs://nyx/user/hongxun/carbon/warehouse</value>
+    <value>hdfs://carbon/warehouse</value>
   </property>
   <property>
     <name>spark.sql.warehouse.dir</name>
-    <value>hdfs://nyx/user/hongxun/carbon/warehouse</value>
+    <value>hdfs://carbon/warehouse</value>
   </property>
   <property>
     <name>javax.jdo.option.ConnectionURL</name>
-    <value>jdbc:mysql://d136092.innet.dip.weibo.com:3307/carbondata?createDatabaseIfNotExist=true</value>
+    <value>jdbc:mysql://ip:3306/carbondata?createDatabaseIfNotExist=true</value>
   </property>
       
   <property>
@@ -109,7 +99,7 @@
       
   <property>
     <name>javax.jdo.option.ConnectionPassword</name>
-    <value>mysqladmin</value>
+    <value>root</value>
   </property>
 
 </configuration>
